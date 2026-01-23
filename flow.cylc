@@ -38,10 +38,12 @@
 			module use /g/data/access/ngm/modules
 			module load ants/2.1.0
 		"""
+		[[[environment]]]
+			PYTHONPATH=$CYLC_WORKFLOW_DIR/lib/python
 
 	[[ancil_lct]]
 		inherit = PBS_large_serial
-		script = python ancil_lct.py
+		script = $PYTHONPATH/python ancil_lct.py
 
 	[[regrid_C4_fraction]]
 		inherit = PBS_large_serial
