@@ -1,17 +1,15 @@
-{% macro small_serial_task() %}
-	[[[directives]]]
-		-q = normal
-		-l ncpus=1
-		-l mem=10GB
-		-l walltime=1:00:00
-		-l jobfs=10GB
-{% endmacro %}
-
-{% macro large_serial_task() %}
-	[[[directives]]]
-		-q = normal
-		-l ncpus=1
-		-l mem=100GB
-		-l walltime=4:00:00
-		-l jobfs=100GB
-{% endmacro %}
+[runtime]
+	[[PBS_small_serial]]
+		[[[directives]]]
+			-q = normal
+			-l ncpus=1
+			-l mem=10GB
+			-l walltime=1:00:00
+			-l jobfs=10GB
+	[[PBS_large_serial]]
+		[[[directives]]]
+			-q = normal
+			-l ncpus=1
+			-l mem=100GB
+			-l walltime=4:00:00
+			-l jobfs=100GB

@@ -1,5 +1,5 @@
 #!jinja2
-{% import "task_resources.cylc" as resources %}
+{% import "task_resources.cylc" %}
 
 [meta]
 	title = "CCI Ancillary Suite"
@@ -40,125 +40,125 @@
 		"""
 
 	[[ancil_lct]]
-		{{ resources.large_serial_task() }}
+		inherit = PBS_large_serial
 		script = echo "Running ancil_lct"
 
 	[[regrid_C4_fraction]]
-		{{ resources.large_serial_task() }}
+		inherit = PBS_large_serial
 		script = echo "Running regrid_C4_fraction"
 
 	[[ancil_C4_fraction]]
-		{{ resources.small_serial_task() }}
+		inherit = PBS_small_serial
 		script = echo "Running ancil_C4_fraction"
 
 	[[regrid_LAI]]
-		{{ resources.large_serial_task() }}
+		inherit = PBS_large_serial
 		script = echo "Running regrid_LAI"
 
 	[[ancil_LAI]]
-		{{ resources.small_serial_task() }}
+		inherit = PBS_small_serial
 		script = echo "Running ancil_LAI"
 
 	[[ancil_canopy_height]]
-		{{ resources.small_serial_task() }}
+		inherit = PBS_small_serial
 		script = echo "Running ancil_canopy_height"
 
 	[[merge_veg_func]]
-		{{ resources.small_serial_task() }}
+		inherit = PBS_small_serial
 		script = echo "Running merge_veg_func"
 
 	[[ancil_soil_hydrology]]
-		{{ resources.large_serial_task() }}
+		inherit = PBS_large_serial
 		script = echo "Running ancil_soil_hydrology"
 
 	[[ancil_topographic_index]]
-		{{ resources.large_serial_task() }}
+		inherit = PBS_large_serial
 		script = echo "Running ancil_topographic_index"
 
 	[[ancil_soil_albedo]]
-		{{ resources.large_serial_task() }}
+		inherit = PBS_large_serial
 		script = echo "Running ancil_soil_albeo"
 
 	[[ancil_merge_soils]]
-		{{ resources.small_serial_task() }}
+		inherit = PBS_small_serial
 		script = echo "Running ancil_merge_soils"
 
 	[[ancil_soil_dust]]
-		{{ resources.large_serial_task() }}
+		inherit = PBS_large_serial
 		script = echo "Running ancil_soil_dust"
 
 	[[ancil_soil_roughness]]
-		{{ resources.large_serial_task() }}
+		inherit = PBS_large_serial
 		script = echo "Running ancil_soil_roughness"
 
 	[[ancil_orographic_formdrag_preproc]]
-		{{ resources.large_serial_task() }}
+		inherit = PBS_large_serial
 		script = echo "Running ancil_orographic_formdrag_preproc"
 
 	[[ancil_orography_filtered_preproc]]
-		{{ resources.large_serial_task() }}
+		inherit = PBS_large_serial
 		script = echo "Running ancil_orography_filtered_preproc"
 
 	[[ancil_orography_unfiltered_preproc]]
-		{{ resources.large_serial_task() }}
+		inherit = PBS_large_serial
 		script = echo "Running ancil_orography_unfiltered_preproc"
 
 	[[ancil_orography_mean]]
-		{{ resources.large_serial_task() }}
+		inherit = PBS_large_serial
 		script = echo "Running ancil_orography_mean"
 
 	[[ancil_orographic_formdrag]]
-		{{ resources.large_serial_task() }}
+		inherit = PBS_large_serial
 		script = echo "Running ancil_orographic_formdrag"
 
 	[[ancil_orographic_wavedrag]]
-		{{ resources.large_serial_task() }}
+		inherit = PBS_large_serial
 		script = echo "Running ancil_orographic_wavedrag"
 
 	[[ancil_aeroclim_preproc]]
-		{{ resources.small_serial_task() }}
+		inherit = PBS_small_serial
 		script = echo "Running ancil_aeroclim_preproc"
 
 	[[regrid_aerosol]]
-		{{ resources.small_serial_task() }}
+		inherit = PBS_small_serial
 		script = echo "Running regrid_aerosol"
 
 	[[regrid_ozone]]
-		{{ resources.small_serial_task() }}
+		inherit = PBS_small_serial
 		script = echo "Running regrid_aerosol"
 
 	[[ancil_radiation_parameters]]
-		{{ resources.large_serial_task() }}
+		inherit = PBS_large_serial
 		script = echo "Running ancil_radiation_parameters"
 
 	[[ancil_clim_dms]]
-		{{ resources.large_serial_task() }}
+		inherit = PBS_large_serial
 		script = echo "Running ancil_clim_dms"
 
 	[[ancil_clim_sea]]
-		{{ resources.large_serial_task() }}
+		inherit = PBS_large_serial
 		script = echo "Running ancil_clim_sea"
 
 	[[regrid_seaice_reynolds]]
-		{{ resources.large_serial_task() }}
+		inherit = PBS_large_serial
 		script = echo "Running regrid_seaice_reynolds"
 
 	[[regrid_SST_reynolds]]
-		{{ resources.large_serial_task() }}
+		inherit = PBS_large_serial
 		script = echo "Running regrid_SST_reynolds"
 
 	[[ancil_river_routing_preproc]]
-		{{ resources.small_serial_task() }}
+		inherit = PBS_small_serial
 		script = echo "Running ancil_river_routing_preproc"
 
 	[[ancil_river_routing]]
-		{{ resources.small_serial_task() }}
+		inherit = PBS_small_serial
 		script = echo "Running ancil_river_routing"
 	
 	[[ancil_river_storage_preproc]]
-		{{ resources.small_serial_task() }}
+		inherit = PBS_small_serial
 		script = echo "Running ancil_river_storage_preproc"
 
 	[[ancil_river_storage]]
-		{{ resources.small_serial_task() }}
+		inherit = PBS_small_serial
 		script = echo "Running ancil_river_storage"
