@@ -1,6 +1,6 @@
 #!jinja2
-
 {% import "task_resources.cylc" as resources %}
+
 [meta]
 	title = "CCI Ancillary Suite"
 	description = "Create a set of ancillaries using CCI Land Cover as the data source."
@@ -34,6 +34,11 @@
 [runtime]
 	[[root]]
 		platform = hpc
+		script = """
+			module use /g/data/access/modules
+			module load ants/2.1.0
+			%(script)s
+		"""
 
 	[[ancil_lct]]
 		{{ resources.large_serial_task() }}
