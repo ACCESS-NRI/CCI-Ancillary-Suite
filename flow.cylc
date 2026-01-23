@@ -37,7 +37,6 @@
 		script = """
 			module use /g/data/access/modules
 			module load ants/2.1.0
-			%(script)s
 		"""
 
 	[[ancil_lct]]
