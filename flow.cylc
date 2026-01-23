@@ -41,7 +41,7 @@
 
 	[[ancil_lct]]
 		inherit = PBS_large_serial
-		script = echo "Running ancil_lct"
+		script = python ancil_lct.py
 
 	[[regrid_C4_fraction]]
 		inherit = PBS_large_serial
