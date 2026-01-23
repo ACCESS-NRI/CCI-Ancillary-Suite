@@ -1,5 +1,5 @@
 #!jinja2
-{% import "task_resources.cylc" %}
+{% include "task_resources.cylc" %}
 
 [meta]
 	title = "CCI Ancillary Suite"
