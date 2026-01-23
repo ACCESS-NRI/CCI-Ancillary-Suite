@@ -33,7 +33,7 @@
 			
 [runtime]
 	[[root]]
-		platform = hpc
+		platform = gadi
 		script = """
 			module use /g/data/access/modules
 			module load ants/2.1.0
