@@ -39,11 +39,11 @@
 			module load ants/2.1.0
 		"""
 		[[[environment]]]
-			PYTHONPATH=$CYLC_WORKFLOW_DIR/lib/python
+			PYTHONPATH=$CYLC_WORKFLOW_RUN_DIR/lib/python
 
 	[[ancil_lct]]
 		inherit = PBS_large_serial
-		script = $PYTHONPATH/python ancil_lct.py
+		script = python $PYTHONPATH/ancil_lct.py
 
 	[[regrid_C4_fraction]]
 		inherit = PBS_large_serial
