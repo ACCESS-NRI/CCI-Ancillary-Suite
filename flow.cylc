@@ -56,7 +56,7 @@
 			{% endif %}	
 
 	[[ancil_lct]]
-                script = rose app-run
+        script = rose app-run
 		inherit = PBS_large_serial
 		[[[environment]]]
 			{% if GRID_SOURCE == "grid_definition" %}
@@ -72,8 +72,8 @@
 			{% endif %}
 
 	[[regrid_C4_fraction]]
+		script = rose app-run
 		inherit = noop
-		script = echo "Running regrid_C4_fraction"
 
 	[[ancil_C4_fraction]]
 		inherit = noop
