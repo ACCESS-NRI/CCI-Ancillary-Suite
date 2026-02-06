@@ -33,7 +33,6 @@
 			
 [runtime]
 	[[root]]
-		platform = pbs
 		init-script = """
 			module use /g/data/access/ngm/modules
 			module load ants/2.1.0
@@ -57,6 +56,7 @@
 			{% endif %}	
 
 	[[ancil_lct]]
+                script = rose app-run
 		inherit = PBS_large_serial
 		[[[environment]]]
 			{% if GRID_SOURCE == "grid_definition" %}
@@ -72,121 +72,121 @@
 			{% endif %}
 
 	[[regrid_C4_fraction]]
-		inherit = PBS_large_serial
+		inherit = noop
 		script = echo "Running regrid_C4_fraction"
 
 	[[ancil_C4_fraction]]
-		inherit = PBS_small_serial
+		inherit = noop
 		script = echo "Running ancil_C4_fraction"
 
 	[[regrid_LAI]]
-		inherit = PBS_large_serial
+		inherit = noop
 		script = echo "Running regrid_LAI"
 
 	[[ancil_LAI]]
-		inherit = PBS_small_serial
+		inherit = noop
 		script = echo "Running ancil_LAI"
 
 	[[ancil_canopy_height]]
-		inherit = PBS_small_serial
+		inherit = noop
 		script = echo "Running ancil_canopy_height"
 
 	[[merge_veg_func]]
-		inherit = PBS_small_serial
+		inherit = noop
 		script = echo "Running merge_veg_func"
 
 	[[ancil_soil_hydrology]]
-		inherit = PBS_large_serial
+		inherit = noop
 		script = echo "Running ancil_soil_hydrology"
 
 	[[ancil_topographic_index]]
-		inherit = PBS_large_serial
+		inherit = noop
 		script = echo "Running ancil_topographic_index"
 
 	[[ancil_soil_albedo]]
-		inherit = PBS_large_serial
+		inherit = noop
 		script = echo "Running ancil_soil_albeo"
 
 	[[ancil_merge_soils]]
-		inherit = PBS_small_serial
+		inherit = noop
 		script = echo "Running ancil_merge_soils"
 
 	[[ancil_soil_dust]]
-		inherit = PBS_large_serial
+		inherit = noop
 		script = echo "Running ancil_soil_dust"
 
 	[[ancil_soil_roughness]]
-		inherit = PBS_large_serial
+		inherit = noop
 		script = echo "Running ancil_soil_roughness"
 
 	[[ancil_orographic_formdrag_preproc]]
-		inherit = PBS_large_serial
+		inherit = noop
 		script = echo "Running ancil_orographic_formdrag_preproc"
 
 	[[ancil_orography_filtered_preproc]]
-		inherit = PBS_large_serial
+		inherit = noop
 		script = echo "Running ancil_orography_filtered_preproc"
 
 	[[ancil_orography_unfiltered_preproc]]
-		inherit = PBS_large_serial
+		inherit = noop
 		script = echo "Running ancil_orography_unfiltered_preproc"
 
 	[[ancil_orography_mean]]
-		inherit = PBS_large_serial
+		inherit = noop
 		script = echo "Running ancil_orography_mean"
 
 	[[ancil_orographic_formdrag]]
-		inherit = PBS_large_serial
+		inherit = noop
 		script = echo "Running ancil_orographic_formdrag"
 
 	[[ancil_orographic_wavedrag]]
-		inherit = PBS_large_serial
+		inherit = noop
 		script = echo "Running ancil_orographic_wavedrag"
 
 	[[ancil_aeroclim_preproc]]
-		inherit = PBS_small_serial
+		inherit = noop
 		script = echo "Running ancil_aeroclim_preproc"
 
 	[[regrid_aerosol]]
-		inherit = PBS_small_serial
+		inherit = noop
 		script = echo "Running regrid_aerosol"
 
 	[[regrid_ozone]]
-		inherit = PBS_small_serial
+		inherit = noop
 		script = echo "Running regrid_aerosol"
 
 	[[ancil_radiation_parameters]]
-		inherit = PBS_large_serial
+		inherit = noop
 		script = echo "Running ancil_radiation_parameters"
 
 	[[ancil_clim_dms]]
-		inherit = PBS_large_serial
+		inherit = noop
 		script = echo "Running ancil_clim_dms"
 
 	[[ancil_clim_sea]]
-		inherit = PBS_large_serial
+		inherit = noop
 		script = echo "Running ancil_clim_sea"
 
 	[[regrid_seaice_reynolds]]
-		inherit = PBS_large_serial
+		inherit = noop
 		script = echo "Running regrid_seaice_reynolds"
 
 	[[regrid_SST_reynolds]]
-		inherit = PBS_large_serial
+		inherit = noop
 		script = echo "Running regrid_SST_reynolds"
 
 	[[ancil_river_routing_preproc]]
-		inherit = PBS_small_serial
+		inherit = noop
 		script = echo "Running ancil_river_routing_preproc"
 
 	[[ancil_river_routing]]
-		inherit = PBS_small_serial
+		inherit = noop
 		script = echo "Running ancil_river_routing"
 	
 	[[ancil_river_storage_preproc]]
-		inherit = PBS_small_serial
+		inherit = noop
 		script = echo "Running ancil_river_storage_preproc"
 
 	[[ancil_river_storage]]
-		inherit = PBS_small_serial
+		inherit = noop
 		script = echo "Running ancil_river_storage"
