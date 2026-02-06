@@ -8,7 +8,7 @@
 			-l mem=10GB
 			-l walltime=1:00:00
 			-l jobfs=10GB
-                        -l storage=gdata/{{ STORAGE_PROJECT }}+scratch/{{ STORAGE_PROJECT }}
+                        -l storage=gdata/access+gdata/{{ STORAGE_PROJECT }}+scratch/{{ STORAGE_PROJECT }}
 	[[PBS_large_serial]]
                 platform = pbs
 		[[[directives]]]
@@ -18,6 +18,6 @@
 			-l mem=100GB
 			-l walltime=4:00:00
 			-l jobfs=100GB
-                        -l storage=gdata/{{ STORAGE_PROJECT }}+scratch/{{ STORAGE_PROJECT }}
+                        -l storage=gdata/access+gdata/{{ STORAGE_PROJECT }}+scratch/{{ STORAGE_PROJECT }}
         [[noop]]
                 platform = localhost
