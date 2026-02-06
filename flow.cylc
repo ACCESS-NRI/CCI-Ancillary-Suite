@@ -42,12 +42,12 @@
 			PYTHONPATH="${CYLC_WORKFLOW_RUN_DIR}/lib/python"
 			ANCIL_TARGET_PATH="/scratch/{{ STORAGE_PROJECT }}/${USER}/${CYLC_SUITE_NAME}"
 			ANCIL_MASTER="/g/data/access/TIDS/UM/ancil"
-			{% if land_model == "CABLE" %}
+			{% if LAND_MODEL == "CABLE" %}
 				MODEL_ICE_TILE = 17
 				MODEL_SOIL_TILE = 14
 				MODEL_C3_GRASS_TILE = 6
 				MODEL_C4_GRASS_TILE = 7
-			{% elif land_model == "JULES" %}
+			{% elif LAND_MODEL == "JULES" %}
 				MODEL_ICE_TILE = 9
 				MODEL_SOIL_TILE = 8
 				MODEL_C3_GRASS_TILE = 3
