@@ -33,8 +33,7 @@
 			
 [runtime]
 	[[root]]
-		platform = localhost
-		job runner = pbs
+		platform = pbs
 		init-script = """
 			module use /g/data/access/ngm/modules
 			module load ants/2.1.0
