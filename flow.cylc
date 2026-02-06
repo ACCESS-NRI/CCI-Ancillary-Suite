@@ -39,11 +39,37 @@
 			module load ants/2.1.0
 		"""
 		[[[environment]]]
-			PYTHONPATH=$CYLC_WORKFLOW_RUN_DIR/lib/python
+			PYTHONPATH="${CYLC_WORKFLOW_RUN_DIR}/lib/python"
+			ANCIL_TARGET_PATH="/scratch/{{ STORAGE_PROJECT }}/${USER}/${CYLC_SUITE_NAME}"
+			ANCIL_MASTER="/g/data/access/TIDS/UM/ancil"
+			{% if land_model == "CABLE" %}
+				MODEL_ICE_TILE = 17
+				MODEL_SOIL_TILE = 14
+				MODEL_C3_GRASS_TILE = 6
+				MODEL_C4_GRASS_TILE = 7
+			{% elif land_model == "JULES" %}
+				MODEL_ICE_TILE = 9
+				MODEL_SOIL_TILE = 8
+				MODEL_C3_GRASS_TILE = 3
+				MODEL_C4_GRASS_TILE = 4
+			{% else %}
+				{{ raise("Invalid LAND_MODEL: " ~ LAND_MODEL) }}
+			{% endif %}	
 
 	[[ancil_lct]]
 		inherit = PBS_large_serial
-		script = python $PYTHONPATH/ancil_lct.py
+		[[[environment]]]
+			{% if GRID_SOURCE == "grid_definition" %}
+				GRID_ARG = "--target-grid={{ grid_file }}"
+			{% elif GRID_SOURCE == "landseamask" %}
+				GRID_ARG = "--target-lsm={{ grid_file }}"
+			{% endif %}
+
+			{% if LAND_MODEL == "CABLE" %}
+				DEFAULT_TRANSFORM = "cci2cable.json"
+			{% elif LAND_MODEL == "JULES" %}
+				DEFAULT_TRANSFORM = "cci2jules.json"
+			{% endif %}
 
 	[[regrid_C4_fraction]]
 		inherit = PBS_large_serial
