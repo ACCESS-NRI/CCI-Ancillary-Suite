@@ -60,9 +60,9 @@
 		inherit = PBS_large_serial
 		[[[environment]]]
 			{% if GRID_SOURCE == "grid_definition" %}
-				GRID_ARG = "--target-grid={{ grid_file }}"
+				GRID_ARG = "--target-grid={{ GRID_FILE }}"
 			{% elif GRID_SOURCE == "landseamask" %}
-				GRID_ARG = "--target-lsm={{ grid_file }}"
+				GRID_ARG = "--target-lsm={{ GRID_FILE }}"
 			{% endif %}
 
 			{% if LAND_MODEL == "CABLE" %}
