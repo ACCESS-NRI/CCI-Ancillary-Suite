@@ -3,7 +3,7 @@
 
 [meta]
 	title = "CCI Ancillary Suite"
-	description = "Create a set of ancillaries using CCI Land Cover as the data source."
+	description = "Create a set of ancillaries using CCI Land Cover as the primary data source."
 
 [scheduling]
 	[[graph]]
@@ -14,9 +14,9 @@
 			(ancil_LAI & ancil_canopy_height) => merge_veg_func
 			ancil_C4_fraction => ancil_soil_hydrology
 			ancil_C4_fraction => ancil_topographic_index
-			ancil_C4_fraction => ancil_soil_albedo
-			(ancil_soil_hydrology & ancil_soil_albedo) => ancil_merge_soils
-			(ancil_C4_fraction & ancil_merge_soils) => ancil_soil_dust
+			(ancil_C4_fraction & regrid_soil_albedo) => ancil_soil_albedo
+			(ancil_soil_hydrology & ancil_soil_albedo) => merge_soils
+			(ancil_C4_fraction & merge_soils) => ancil_soil_dust
 			(ancil_lct & ancil_LAI) => ancil_soil_roughness
 			(ancil_orographic_formdrag_preproc & ancil_lct) => ancil_orographic_formdrag
 			(ancil_orography_mean & ancil_orography_filtered_preproc & ancil_lct) => ancil_orographic_wavedrag
@@ -46,11 +46,13 @@
 				MODEL_SOIL_TILE = 14
 				MODEL_C3_GRASS_TILE = 6
 				MODEL_C4_GRASS_TILE = 7
+				MODEL_TREE_TILES = "1,2,3,4"
 			{% elif LAND_MODEL == "JULES" %}
 				MODEL_ICE_TILE = 9
 				MODEL_SOIL_TILE = 8
 				MODEL_C3_GRASS_TILE = 3
 				MODEL_C4_GRASS_TILE = 4
+				MODEL_TREE_TILES = "1,2"
 			{% else %}
 				{{ raise("Invalid LAND_MODEL: " ~ LAND_MODEL) }}
 			{% endif %}	
@@ -82,6 +84,12 @@
 	[[regrid_LAI]]
 		inherit = noop
 		script = echo "Running regrid_LAI"
+		[[[environment]]]
+			{% if LAND_MODEL == "CABLE" %}
+				DEFAULT_WEIGHTS = "lai_weights_cable.json"
+			{% elif LAND_MODEL == "JULES" %}
+				DEFAULT_WEIGHTS = "lai_weights_jules.json"
+			{% endif %}
 
 	[[ancil_LAI]]
 		inherit = noop
@@ -90,6 +98,12 @@
 	[[ancil_canopy_height]]
 		inherit = noop
 		script = echo "Running ancil_canopy_height"
+		[[[environment]]]
+			{% if LAND_MODEL == "CABLE" %}
+				DEFAULT_HEIGHT_FACTORS="canopy_height_factors_cable.json"
+			{% elif LAND_MODEL == "JULES" %}
+				DEFAULT_HEIGHT_FACTORS="canopy_height_factors_jules.json"
+			{% endif %}
 
 	[[merge_veg_func]]
 		inherit = noop
@@ -103,13 +117,17 @@
 		inherit = noop
 		script = echo "Running ancil_topographic_index"
 
+	[[regrid_soil_albedo]]
+		inherit = noop
+		script = echo "Running regrid_soil_albedo"
+
 	[[ancil_soil_albedo]]
 		inherit = noop
 		script = echo "Running ancil_soil_albeo"
 
-	[[ancil_merge_soils]]
+	[[merge_soils]]
 		inherit = noop
-		script = echo "Running ancil_merge_soils"
+		script = echo "Running merge_soils"
 
 	[[ancil_soil_dust]]
 		inherit = noop
