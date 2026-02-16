@@ -84,16 +84,16 @@
 	[[regrid_LAI]]
 		inherit = noop
 		script = echo "Running regrid_LAI"
+
+	[[ancil_LAI]]
+		inherit = noop
+		script = echo "Running ancil_LAI"
 		[[[environment]]]
 			{% if LAND_MODEL == "CABLE" %}
 				DEFAULT_WEIGHTS = "lai_weights_cable.json"
 			{% elif LAND_MODEL == "JULES" %}
 				DEFAULT_WEIGHTS = "lai_weights_jules.json"
 			{% endif %}
-
-	[[ancil_LAI]]
-		inherit = noop
-		script = echo "Running ancil_LAI"
 
 	[[ancil_canopy_height]]
 		inherit = noop
@@ -171,7 +171,7 @@
 
 	[[regrid_ozone]]
 		inherit = noop
-		script = echo "Running regrid_aerosol"
+		script = echo "Running regrid_ozone"
 
 	[[ancil_radiation_parameters]]
 		inherit = noop
