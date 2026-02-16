@@ -151,7 +151,7 @@ def monthly_means(dpath, month, gregorian=False):
     files = f"{dpath}/*{month}.pp"
     print(f"Reading {files}")
     # Load selected files using ANTS loader
-    cubes = ants.io.load.load(sorted(glob.glob(files)))
+    cubes = ants.load(sorted(glob.glob(files)))
     # Create monthly mean for each cube in cubes
     means = iris.cube.CubeList([time_mean(cube, gregorian=gregorian) for cube in cubes])
     return means
