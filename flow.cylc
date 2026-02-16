@@ -58,7 +58,7 @@
 			{% endif %}	
 
 	[[ancil_lct]]
-        script = rose app-run
+        script = rose task-run
 		inherit = PBS_large_serial
 		[[[environment]]]
 			{% if GRID_SOURCE == "grid_definition" %}
@@ -74,20 +74,20 @@
 			{% endif %}
 
 	[[regrid_C4_fraction]]
-		script = rose app-run
+		script = rose task-run
 		inherit = PBS_large_serial
 
 	[[ancil_C4_fraction]]
 		inherit = PBS_large_serial
-		script = rose app-run
+		script = rose task-run
 
 	[[regrid_LAI]]
 		inherit = PBS_large_serial
-		script = rose app-run
+		script = rose task-run
 
 	[[ancil_LAI]]
 		inherit = PBS_large_serial
-		script = rose app-run
+		script = rose task-run
 		[[[environment]]]
 			{% if LAND_MODEL == "CABLE" %}
 				DEFAULT_WEIGHTS = "lai_weights_cable.json"
@@ -97,7 +97,7 @@
 
 	[[ancil_canopy_height]]
 		inherit = PBS_large_serial
-		script = rose app-run
+		script = rose task-run
 		[[[environment]]]
 			{% if LAND_MODEL == "CABLE" %}
 				DEFAULT_HEIGHT_FACTORS="canopy_height_factors_cable.json"
@@ -107,104 +107,104 @@
 
 	[[merge_veg_func]]
 		inherit = PBS_large_serial
-		script = rose app-run
+		script = rose task-run
 
 	[[ancil_soil_hydrology]]
 		inherit = PBS_large_serial
-		script = rose app-run
+		script = rose task-run
 
 	[[ancil_topographic_index]]
 		inherit = PBS_large_serial
-		script = rose app-run
+		script = rose task-run
 
 	[[regrid_soil_albedo]]
 		inherit = PBS_large_serial
-		script = rose app-run
+		script = rose task-run
 
 	[[ancil_soil_albedo]]
 		inherit = PBS_large_serial
-		script = rose app-run
+		script = rose task-run
 
 	[[merge_soils]]
 		inherit = PBS_large_serial
-		script = rose app-run
+		script = rose task-run
 
 	[[ancil_soil_dust]]
 		inherit = PBS_large_serial
-		script = rose app-run
+		script = rose task-run
 
 	[[ancil_soil_roughness]]
 		inherit = PBS_large_serial
-		script = rose app-run
+		script = rose task-run
 
 	[[ancil_orographic_formdrag_preproc]]
 		inherit = PBS_large_serial
-		script = rose app-run
+		script = rose task-run
 
 	[[ancil_orography_filtered_preproc]]
 		inherit = PBS_large_serial
-		script = rose app-run
+		script = rose task-run
 
 	[[ancil_orography_unfiltered_preproc]]
 		inherit = PBS_large_serial
-		script = rose app-run
+		script = rose task-run
 
 	[[ancil_orography_mean]]
 		inherit = PBS_large_serial
-		script = rose app-run
+		script = rose task-run
 
 	[[ancil_orographic_formdrag]]
 		inherit = PBS_large_serial
-		script = rose app-run
+		script = rose task-run
 
 	[[ancil_orographic_wavedrag]]
 		inherit = PBS_large_serial
-		script = rose app-run
+		script = rose task-run
 
 	[[ancil_aeroclim_preproc]]
 		inherit = PBS_large_serial
-		script = rose app-run
+		script = rose task-run
 
 	[[regrid_aerosol]]
 		inherit = PBS_large_serial
-		script = rose app-run
+		script = rose task-run
 
 	[[regrid_ozone]]
 		inherit = PBS_large_serial
-		script = rose app-run
+		script = rose task-run
 
 	[[ancil_radiation_parameters]]
 		inherit = PBS_large_serial
-		script = rose app-run
+		script = rose task-run
 
 	[[ancil_clim_dms]]
 		inherit = PBS_large_serial
-		script = rose app-run
+		script = rose task-run
 
 	[[ancil_clim_sea]]
 		inherit = PBS_large_serial
-		script = rose app-run
+		script = rose task-run
 
 	[[regrid_seaice_reynolds]]
 		inherit = PBS_large_serial
-		script = rose app-run
+		script = rose task-run
 
 	[[regrid_SST_reynolds]]
 		inherit = PBS_large_serial
-		script = rose app-run
+		script = rose task-run
 
 	[[ancil_river_routing_preproc]]
 		inherit = PBS_large_serial
-		script = rose app-run
+		script = rose task-run
 
 	[[ancil_river_routing]]
 		inherit = PBS_large_serial
-		script = rose app-run
+		script = rose task-run
 	
 	[[ancil_river_storage_preproc]]
 		inherit = PBS_large_serial
-		script = rose app-run
+		script = rose task-run
 
 	[[ancil_river_storage]]
 		inherit = PBS_large_serial
-		script = rose app-run
+		script = rose task-run
