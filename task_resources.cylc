@@ -1,23 +1,34 @@
 [runtime]
 	[[PBS_small_serial]]
-                platform = pbs
+        platform = pbs
 		[[[directives]]]
 			-q = normal
-                        -P = {{ COMPUTE_PROJECT }}
+            -P = {{ COMPUTE_PROJECT }}
 			-l ncpus=1
 			-l mem=10GB
 			-l walltime=1:00:00
 			-l jobfs=10GB
-                        -l storage=gdata/hr22+gdata/access+gdata/{{ STORAGE_PROJECT }}+scratch/{{ STORAGE_PROJECT }}
+            -l storage=gdata/hr22+gdata/access+gdata/{{ STORAGE_PROJECT }}+scratch/{{ STORAGE_PROJECT }}
 	[[PBS_large_serial]]
-                platform = pbs
+        platform = pbs
 		[[[directives]]]
 			-q = normal
-                        -P = {{ COMPUTE_PROJECT }}
+            -P = {{ COMPUTE_PROJECT }}
 			-l ncpus=1
 			-l mem=100GB
 			-l walltime=4:00:00
 			-l jobfs=100GB
-                        -l storage=gdata/hr22+gdata/access+gdata/{{ STORAGE_PROJECT }}+scratch/{{ STORAGE_PROJECT }}
+            -l storage=gdata/hr22+gdata/access+gdata/{{ STORAGE_PROJECT }}+scratch/{{ STORAGE_PROJECT }}
         [[noop]]
                 platform = localhost
+
+	[[PBS_huge_serial]]
+		platform = pbs
+		[[[directives]]]
+			-q = hugemem
+            -P = {{ COMPUTE_PROJECT }}
+			-l ncpus=1
+			-l mem=500GB
+			-l walltime=4:00:00
+			-l jobfs=100GB
+            -l storage=gdata/hr22+gdata/access+gdata/{{ STORAGE_PROJECT }}+scratch/{{ STORAGE_PROJECT }}

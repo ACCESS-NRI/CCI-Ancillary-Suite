@@ -9,7 +9,7 @@
 	[[graph]]
 		R1 = """
 			ancil_lct => regrid_C4_fraction => ancil_C4_fraction
-			(regrid_LAI & ancil_C4_fraction) => ancil_LAI
+			((ancil_lct => regrid_LAI) & ancil_C4_fraction) => ancil_LAI
 			ancil_LAI => ancil_canopy_height
 			(ancil_LAI & ancil_canopy_height) => merge_veg_func
 			ancil_C4_fraction => ancil_soil_hydrology
@@ -59,7 +59,7 @@
 
 	[[ancil_lct]]
         script = rose task-run
-		inherit = PBS_large_serial
+		inherit = PBS_huge_serial
 		[[[environment]]]
 			{% if GRID_SOURCE == "grid_definition" %}
 				GRID_ARG = "--target-grid={{ GRID_FILE }}"
@@ -164,6 +164,8 @@
 	[[ancil_aeroclim_preproc]]
 		inherit = PBS_large_serial
 		script = rose task-run
+		[[[environment]]]
+			CALENDAR = {{ CALENDAR }}
 
 	[[regrid_aerosol]]
 		inherit = PBS_large_serial
