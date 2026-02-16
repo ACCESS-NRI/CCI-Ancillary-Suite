@@ -38,7 +38,6 @@
 			module load ants/2.1.0
 		"""
 		[[[environment]]]
-			PYTHONPATH="${CYLC_WORKFLOW_RUN_DIR}/lib/python"
 			ANCIL_TARGET_PATH="/scratch/{{ STORAGE_PROJECT }}/${USER}/${CYLC_SUITE_NAME}"
 			ANCIL_MASTER="/g/data/access/TIDS/UM/ancil"
 			{% if LAND_MODEL == "CABLE" %}
@@ -164,6 +163,9 @@
 	[[ancil_aeroclim_preproc]]
 		inherit = PBS_large_serial
 		script = rose task-run
+		init-script = """
+			module load nco
+		"""
 
 	[[regrid_aerosol]]
 		inherit = PBS_large_serial
