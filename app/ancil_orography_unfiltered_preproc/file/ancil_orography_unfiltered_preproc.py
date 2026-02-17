@@ -26,8 +26,6 @@ def main(sources, output, netcdf_only):
     save.netcdf(source, output)
     if netcdf_only:
         save.ancil(source, output)
-    else:
-        ants.save(source, output, saver="nc")
 
     return source
 
