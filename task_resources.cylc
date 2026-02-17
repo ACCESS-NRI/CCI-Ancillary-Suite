@@ -28,7 +28,7 @@
       -P = {{ COMPUTE_PROJECT }}
 			-l ncpus=1
 			-l mem=100GB
-			-l walltime=6:00:00
+			-l walltime=10:00:00
 			-l jobfs=100GB
       -l storage=gdata/hr22+gdata/access+gdata/{{ STORAGE_PROJECT }}+scratch/{{ STORAGE_PROJECT }}
 
