@@ -9,11 +9,13 @@
 	[[graph]]
 		R1 = """
 			ancil_lct => regrid_C4_fraction => ancil_C4_fraction
-			((ancil_lct => regrid_LAI) & ancil_C4_fraction) => ancil_LAI
+			ancil_lct => regrid_LAI
+			(ancil_C4_fraction & regrid_LAI) => ancil_LAI
 			ancil_LAI => ancil_canopy_height
 			(ancil_LAI & ancil_canopy_height) => merge_veg_func
 			ancil_C4_fraction => ancil_soil_hydrology
 			ancil_C4_fraction => ancil_topographic_index
+			ancil_lct => regrid_soil_albedo
 			(ancil_C4_fraction & regrid_soil_albedo) => ancil_soil_albedo
 			(ancil_soil_hydrology & ancil_soil_albedo) => merge_soils
 			(ancil_C4_fraction & merge_soils) => ancil_soil_dust
