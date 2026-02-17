@@ -21,7 +21,7 @@
 			(ancil_C4_fraction & merge_soils) => ancil_soil_dust
 			(ancil_lct & ancil_LAI) => ancil_soil_roughness
 			(ancil_orographic_formdrag_preproc & ancil_lct) => ancil_orographic_formdrag
-			(ancil_orography_mean & ancil_orography_filtered_preproc & ancil_lct) => ancil_orographic_wavedrag
+			(ancil_lct & ancil_orography_unfiltered_preproc) => ancil_orography_mean => ancil_orographic_wavedrag
 			(ancil_aeroclim_preproc & ancil_orographic_wavedrag) => regrid_aerosol
 			ancil_orographic_wavedrag => regrid_ozone
 			ancil_lct => ancil_clim_dms
@@ -148,7 +148,7 @@
 		script = rose task-run
 
 	[[ancil_orography_unfiltered_preproc]]
-		inherit = PBS_large_serial
+		inherit = PBS_medium_serial
 		script = rose task-run
 
 	[[ancil_orography_mean]]
@@ -160,7 +160,7 @@
 		script = rose task-run
 
 	[[ancil_orographic_wavedrag]]
-		inherit = PBS_large_serial
+		inherit = PBS_small_serial
 		script = rose task-run
 
 	[[ancil_aeroclim_preproc]]
@@ -198,17 +198,17 @@
 		script = rose task-run
 
 	[[ancil_river_routing_preproc]]
-		inherit = PBS_large_serial
+		inherit = PBS_small_serial
 		script = rose task-run
 
 	[[ancil_river_routing]]
-		inherit = PBS_large_serial
+		inherit = PBS_small_serial
 		script = rose task-run
 	
 	[[ancil_river_storage_preproc]]
-		inherit = PBS_large_serial
+		inherit = PBS_small_serial
 		script = rose task-run
 
 	[[ancil_river_storage]]
-		inherit = PBS_large_serial
+		inherit = PBS_small_serial
 		script = rose task-run
