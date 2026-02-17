@@ -102,9 +102,9 @@
 		script = rose task-run
 		[[[environment]]]
 			{% if LAND_MODEL == "CABLE" %}
-				DEFAULT_HEIGHT_FACTORS="canopy_height_factors_cable.json"
+				DEFAULT_HEIGHT_FACTORS = "canopy_height_factors_cable.json"
 			{% elif LAND_MODEL == "JULES" %}
-				DEFAULT_HEIGHT_FACTORS="canopy_height_factors_jules.json"
+				DEFAULT_HEIGHT_FACTORS = "canopy_height_factors_jules.json"
 			{% endif %}
 
 	[[merge_veg_func]]

@@ -164,6 +164,7 @@ def parse_args():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--source-root", type=str, required=True, help="Source root.")
     parser.add_argument(
+        "-o",
         "--output",
         type=str,
         required=True,
