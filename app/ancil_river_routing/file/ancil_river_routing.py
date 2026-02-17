@@ -177,7 +177,6 @@ def main(
     ocean_river_number_file,
     orca_dom_file,
     land_threshold_outflow,
-    use_new_saver,
     netcdf_only,
 ):
     sequence_cube, direction_cube, lcf_cube = load_data(
@@ -205,12 +204,10 @@ def main(
     # Note order is (direction, sequence, ...) while most arguments in
     # this file are (sequence, direction, ...)
     cubes = iris.cube.CubeList([direction_cube, sequence_cube])
-    if use_new_saver:
-        if not netcdf_only:
-            save.ancil(cubes, output_filepath)
-        save.netcdf(cubes, output_filepath)
-    else:
-        ants.save(cubes, output_filepath)
+    
+    save.netcdf(cubes, output_filepath)
+    if not netcdf_only:
+        save.ancil(cubes, output_filepath)
 
     return sequence_cube, direction_cube
 
@@ -276,6 +273,5 @@ if __name__ == "__main__":
         ocean_river_number_file=args.ocean_river_number_file,
         orca_dom_file=args.orca_dom_file,
         land_threshold_outflow=args.land_threshold_outflow,
-        use_new_saver=args.use_new_saver,
         netcdf_only=args.netcdf_only,
     )

@@ -58,14 +58,13 @@ def correct_metadata(direction, sequence):
     return iris.cube.CubeList([sequence_cube, direction_cube])
 
 
-def main(source_filepath, output_filepath, use_new_saver, netcdf_only):
+def main(source_filepath, output_filepath, netcdf_only):
     direction_field, sequence_field = load_data(source_filepath)
     cubes = correct_metadata(direction_field, sequence_field)
 
-    if use_new_saver:
-        save.netcdf(cubes, output_filepath)
-    else:
-        ants.save(cubes, output_filepath)
+    save.netcdf(cubes, output_filepath)
+    if not netcdf_only:
+        save.ancil(cubes, output_filepath)
 
     return cubes
 
@@ -77,4 +76,4 @@ def _get_parser():
 
 if __name__ == "__main__":
     args = _get_parser().parse_args()
-    main(args.sources, args.output, args.use_new_saver, args.netcdf_only)
+    main(args.sources, args.output, args.netcdf_only)

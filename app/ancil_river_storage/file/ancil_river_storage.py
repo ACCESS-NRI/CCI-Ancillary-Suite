@@ -42,16 +42,13 @@ def river_storage(direction_cube, storage_source):
     return storage_cube
 
 
-def main(source_path, output_filepath, use_new_saver, netcdf_only):
+def main(source_path, output_filepath, netcdf_only):
     direction_cube, storage_cube = load_data(source_path)
     storage_cube = river_storage(direction_cube, storage_cube)
 
-    if use_new_saver:
-        if not netcdf_only:
-            save.ancil(storage_cube, output_filepath)
-        save.netcdf(storage_cube, output_filepath)
-    else:
-        ants.save(storage_cube, output_filepath)
+    save.netcdf(storage_cube, output_filepath)
+    if not netcdf_only:
+        save.ancil(storage_cube, output_filepath)
 
     return storage_cube
 
@@ -63,4 +60,4 @@ def _get_parser():
 
 if __name__ == "__main__":
     args = _get_parser().parse_args()
-    main(args.sources, args.output, args.use_new_saver, args.netcdf_only)
+    main(args.sources, args.output, args.netcdf_only)
