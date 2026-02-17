@@ -144,7 +144,7 @@
 		script = rose task-run
 
 	[[ancil_orography_filtered_preproc]]
-		inherit = PBS_large_serial
+		inherit = PBS_huge_serial
 		script = rose task-run
 
 	[[ancil_orography_unfiltered_preproc]]
