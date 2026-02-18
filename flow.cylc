@@ -30,7 +30,7 @@
 			ancil_lct => regrid_seaice_reynolds
 			ancil_lct => regrid_SST_reynolds
 			(ancil_river_routing_preproc & ancil_lct) => ancil_river_routing
-			(ancil_river_storage_preproc & ancil_river_routing) => ancil_river_storage
+			ancil_river_routing => ancil_river_storage_preproc => ancil_river_storage
 		"""
 			
 [runtime]
