@@ -14,6 +14,7 @@ import ants
 import cf_units
 import iris
 import iris.fileformats.pp
+import ants.save as
 import numpy as np
 
 # Variable names used in LFRic interface to ancillary file
@@ -228,7 +229,7 @@ def main():
     print(clims)
     print(f"Writing {args.output}")
     # Save ancillary using UKCA saver
-    ants.save(clims, args.output, saver="ukca")
+    ants.io.save(clims, args.output, saver="ukca")
 
 
 if __name__ == "__main__":
