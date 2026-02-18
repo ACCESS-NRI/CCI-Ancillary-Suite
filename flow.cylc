@@ -61,7 +61,7 @@
 
 	[[ancil_lct]]
         script = rose task-run
-		inherit = PBS_huge_serial
+		inherit = PBS_huge_parallel
 		[[[environment]]]
 			{% if GRID_SOURCE == "grid_definition" %}
 				GRID_ARG = "--target-grid={{ GRID_FILE }}"
