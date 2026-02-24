@@ -14,7 +14,6 @@ import ants
 import cf_units
 import iris
 import iris.fileformats.pp
-import ants.save as
 import numpy as np
 
 # Variable names used in LFRic interface to ancillary file
