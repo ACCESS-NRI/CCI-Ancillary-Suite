@@ -62,6 +62,10 @@
 	[[ancil_lct]]
         script = rose task-run
 		inherit = PBS_huge_parallel
+		init-script = """
+			module use /g/data/access/ngm/modules
+			module load ants/1.1.0
+		"""
 		[[[environment]]]
 			{% if GRID_SOURCE == "grid_definition" %}
 				GRID_ARG = "--target-grid={{ GRID_FILE }}"
