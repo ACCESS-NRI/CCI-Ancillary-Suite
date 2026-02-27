@@ -59,8 +59,8 @@
 		[[[directives]]]
 			-q = hugemem
       -P = {{ COMPUTE_PROJECT }}
-			-l ncpus=1
-			-l mem=500GB
+			-l ncpus=16
+			-l mem=1000GB
 			-l walltime=4:00:00
-			-l jobfs=100GB
+			-l jobfs=10GB
       -l storage=gdata/hr22+gdata/access+gdata/{{ STORAGE_PROJECT }}+scratch/{{ STORAGE_PROJECT }}
