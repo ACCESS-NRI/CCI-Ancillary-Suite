@@ -29,7 +29,7 @@ def operation(source, target):
     return result
 
 
-def main(sources, output, target_lsm):
+def main(sources, output, target_lsm, netcdf_only):
     lsm_cube, dms_cube = load(sources, target_lsm)
     res_cube = decomp.decompose(operation, dms_cube, lsm_cube)
     ants.analysis.make_consistent_with_lsm(res_cube, lsm_cube, False)

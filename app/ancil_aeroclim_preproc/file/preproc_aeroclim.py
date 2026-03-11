@@ -228,7 +228,7 @@ def main():
     print(clims)
     print(f"Writing {args.output}")
     # Save ancillary using UKCA saver
-    ants.io.save(clims, args.output, saver="ukca")
+    ants.io.save.ukca_netcdf(clims, args.output)
 
 
 if __name__ == "__main__":
