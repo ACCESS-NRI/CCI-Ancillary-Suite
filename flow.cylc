@@ -43,6 +43,7 @@
 		[[[environment]]]
 			ANCIL_TARGET_PATH="/scratch/{{ STORAGE_PROJECT }}/${USER}/cylc-run/${CYLC_SUITE_NAME}/share"
 			ANCIL_MASTER="/g/data/access/TIDS/UM/ancil"
+                        CALENDAR={{ CALENDAR }}
 			{% if LAND_MODEL == "CABLE" %}
 				MODEL_ICE_TILE = 17
 				MODEL_SOIL_TILE = 14
@@ -123,7 +124,7 @@
 		inherit = PBS_large_serial
 		script = rose task-run
 
-	[[regrid_soil_albedo]]
+	[[regrid_albedo]]
 		inherit = PBS_large_serial
 		script = rose task-run
 
