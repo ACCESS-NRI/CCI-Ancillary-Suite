@@ -15,15 +15,15 @@
 			(ancil_LAI & ancil_canopy_height) => merge_veg_func
 			ancil_C4_fraction => ancil_soil_hydrology
 			ancil_C4_fraction => ancil_topographic_index
-			ancil_lct => regrid_soil_albedo
-			(ancil_C4_fraction & regrid_soil_albedo) => ancil_soil_albedo
+			ancil_lct => regrid_albedo
+			(ancil_C4_fraction & regrid_albedo) => ancil_soil_albedo
 			(ancil_soil_hydrology & ancil_soil_albedo) => merge_soils
 			(ancil_C4_fraction & merge_soils) => ancil_soil_dust
 			(ancil_lct & ancil_LAI) => ancil_soil_roughness
 			(ancil_orographic_formdrag_preproc & ancil_lct) => ancil_orographic_formdrag
 			(ancil_lct & ancil_orography_unfiltered_preproc) => ancil_orography_mean => ancil_orographic_wavedrag
 			(ancil_aeroclim_preproc & ancil_orographic_wavedrag) => regrid_aerosol
-			ancil_orographic_wavedrag => regrid_ozone
+			(ancil_orography_filtered_preproc & ancil_orography_mean) => ancil_orographic_wavedrag => regrid_ozone
 			ancil_lct => ancil_clim_dms
 			ancil_lct => ancil_clim_sea
 			(ancil_orography_unfiltered_preproc & ancil_lct) => ancil_radiation_parameters
@@ -36,14 +36,15 @@
 [runtime]
 	[[root]]
 		init-script = """
-			module use /g/data/access/ngm/modules
-			module load ants/2.1.0
+			module use /g/data/xp65/public/modules
+			module load conda/analysis3-25.08
 			module load nco
 		"""
 		[[[environment]]]
-			ANCIL_TARGET_PATH="/scratch/{{ STORAGE_PROJECT }}/${USER}/cylc-run/${CYLC_SUITE_NAME}/share"
+			ANCIL_TARGET_PATH="/scratch/{{ STORAGE_PROJECT }}/${USER}/cylc-run/${CYLC_SUITE_NAME}/share/data"
 			ANCIL_MASTER="/g/data/access/TIDS/UM/ancil"
-                        CALENDAR={{ CALENDAR }}
+			ANCIL_PREPROC_PATH="/g/data/access/TIDS/RMED/ANTS/preproc"
+			CALENDAR={{ CALENDAR }}
 			{% if LAND_MODEL == "CABLE" %}
 				MODEL_ICE_TILE = 17
 				MODEL_SOIL_TILE = 14
@@ -62,7 +63,7 @@
 
 	[[ancil_lct]]
         script = rose task-run
-		inherit = PBS_large_serial
+		inherit = PBS_medium_parallel
 		init-script = """
 			module use /g/data/access/ngm/modules
 			module load ants/1.1.0
@@ -82,18 +83,18 @@
 
 	[[regrid_C4_fraction]]
 		script = rose task-run
-		inherit = PBS_large_serial
+		inherit = PBS_medium_parallel
 
 	[[ancil_C4_fraction]]
-		inherit = PBS_large_serial
+		inherit = PBS_medium_parallel
 		script = rose task-run
 
 	[[regrid_LAI]]
-		inherit = PBS_large_serial
+		inherit = PBS_medium_parallel
 		script = rose task-run
 
 	[[ancil_LAI]]
-		inherit = PBS_large_serial
+		inherit = PBS_medium_parallel
 		script = rose task-run
 		[[[environment]]]
 			{% if LAND_MODEL == "CABLE" %}
@@ -103,7 +104,7 @@
 			{% endif %}
 
 	[[ancil_canopy_height]]
-		inherit = PBS_large_serial
+		inherit = PBS_medium_serial
 		script = rose task-run
 		[[[environment]]]
 			{% if LAND_MODEL == "CABLE" %}
@@ -113,55 +114,55 @@
 			{% endif %}
 
 	[[merge_veg_func]]
-		inherit = PBS_large_serial
-		script = rose task-run
-
-	[[ancil_soil_hydrology]]
-		inherit = PBS_large_serial
-		script = rose task-run
-
-	[[ancil_topographic_index]]
-		inherit = PBS_large_serial
-		script = rose task-run
-
-	[[regrid_albedo]]
-		inherit = PBS_large_serial
-		script = rose task-run
-
-	[[ancil_soil_albedo]]
-		inherit = PBS_large_serial
-		script = rose task-run
-
-	[[merge_soils]]
-		inherit = PBS_large_serial
-		script = rose task-run
-
-	[[ancil_soil_dust]]
-		inherit = PBS_large_serial
-		script = rose task-run
-
-	[[ancil_soil_roughness]]
-		inherit = PBS_large_serial
-		script = rose task-run
-
-	[[ancil_orographic_formdrag_preproc]]
-		inherit = PBS_large_serial
-		script = rose task-run
-
-	[[ancil_orography_filtered_preproc]]
-		inherit = PBS_huge_serial
-		script = rose task-run
-
-	[[ancil_orography_unfiltered_preproc]]
 		inherit = PBS_medium_serial
 		script = rose task-run
 
+	[[ancil_soil_hydrology]]
+		inherit = PBS_medium_parallel
+		script = rose task-run
+
+	[[ancil_topographic_index]]
+		inherit = PBS_medium_parallel
+		script = rose task-run
+
+	[[regrid_albedo]]
+		inherit = PBS_medium_parallel
+		script = rose task-run
+
+	[[ancil_soil_albedo]]
+		inherit = PBS_medium_parallel
+		script = rose task-run
+
+	[[merge_soils]]
+		inherit = PBS_medium_parallel
+		script = rose task-run
+
+	[[ancil_soil_dust]]
+		inherit = PBS_medium_parallel
+		script = rose task-run
+
+	[[ancil_soil_roughness]]
+		inherit = PBS_medium_parallel
+		script = rose task-run
+
+	[[ancil_orographic_formdrag_preproc]]
+		inherit = PBS_medium_parallel
+		script = rose task-run
+
+	[[ancil_orography_filtered_preproc]]
+		inherit = PBS_huge_parallel
+		script = rose task-run
+
+	[[ancil_orography_unfiltered_preproc]]
+		inherit = PBS_huge_parallel
+		script = rose task-run
+
 	[[ancil_orography_mean]]
-		inherit = PBS_large_serial
+		inherit = PBS_medium_parallel
 		script = rose task-run
 
 	[[ancil_orographic_formdrag]]
-		inherit = PBS_large_serial
+		inherit = PBS_medium_parallel
 		script = rose task-run
 
 	[[ancil_orographic_wavedrag]]
@@ -169,37 +170,42 @@
 		script = rose task-run
 
 	[[ancil_aeroclim_preproc]]
-		inherit = PBS_large_serial
+		inherit = PBS_medium_parallel
 		script = rose task-run
+		init-script = """
+			module use /g/data/access/ngm/modules
+			module load ants/1.2.0
+                        module load nco
+		"""
 		[[[environment]]]
 			CALENDAR = {{ CALENDAR }}
 
 	[[regrid_aerosol]]
-		inherit = PBS_large_serial
+		inherit = PBS_medium_parallel
 		script = rose task-run
 
 	[[regrid_ozone]]
-		inherit = PBS_large_serial
+		inherit = PBS_medium_parallel
 		script = rose task-run
 
 	[[ancil_radiation_parameters]]
-		inherit = PBS_large_serial
+		inherit = PBS_medium_parallel
 		script = rose task-run
 
 	[[ancil_clim_dms]]
-		inherit = PBS_large_serial
+		inherit = PBS_medium_parallel
 		script = rose task-run
 
 	[[ancil_clim_sea]]
-		inherit = PBS_large_serial
+		inherit = PBS_medium_parallel
 		script = rose task-run
 
 	[[regrid_seaice_reynolds]]
-		inherit = PBS_large_serial
+		inherit = PBS_large_parallel
 		script = rose task-run
 
 	[[regrid_SST_reynolds]]
-		inherit = PBS_large_serial
+		inherit = PBS_large_parallel
 		script = rose task-run
 
 	[[ancil_river_routing_preproc]]

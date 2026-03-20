@@ -27,7 +27,7 @@ def ydist2index(cube, dist_limit):
     """
     def get_index(start_pnts, end_pnts, geodesic, dist):
         distance_per_lat_grid_pnt = geodesic.inverse(
-            start_pnts, end_pnts).base[0, 0]
+            start_pnts, end_pnts)[0, 0]
 
         return int(np.ceil((dist / distance_per_lat_grid_pnt)))
 
@@ -38,9 +38,7 @@ def ydist2index(cube, dist_limit):
     y = cube.coord(axis='y').points
     x = cube.coord(axis='x').points
     crs = cube.coord(axis='y').coord_system.as_ants_crs().as_cartopy_crs()
-    print(f"crs is: {crs}")
-    geodesic = cartopy.geodesic.Geodesic(crs.globe.semimajor_axis, 0)
-    print(f"geodesic is: {geodesic}")
+    geodesic = cartopy.geodesic.Geodesic(crs.globe.semimajor_axis, 0.0)
 
     # Gen y
     start_pnts = [x[0], y[0]]

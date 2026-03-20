@@ -40,7 +40,7 @@ import numpy as np
 
 def mean_stdev(source, target):
     mean_cube = ants.analysis.mean(source, target)
-    stdev_cube = ants.analysis.stdev(source, mean_cube)
+    stdev_cube = ants.analysis.standard_deviation(source, mean_cube)
     return mean_cube, stdev_cube
 
 
@@ -59,7 +59,7 @@ def topographic_index(src_cube, lct_cube, ice_id):
 
     result = decomp.decompose(mean_stdev, src_cube, ice_level_cube)
     # For now we write to separate files
-    mean_cube = result.extract_strict("mean topographic index")
+    mean_cube = result.extract_cubes("mean topographic index")[0]
     mean_cube.attributes["STASH"] = iris.fileformats.pp.STASH.from_msi("m01s00i274")
 
     # Don't fill locations which are supposed to be ice.  Topographic index
@@ -71,7 +71,7 @@ def topographic_index(src_cube, lct_cube, ice_id):
     target_mask_noice = mean_cube.copy(ice + target_mask.data)
     filler = ants.analysis.FillMissingPoints(mean_cube, target_mask=target_mask_noice)
     filler(mean_cube)
-    stdev_cube = result.extract_strict("standard deviation topographic index")
+    stdev_cube = result.extract_cubes("standard deviation topographic index")[0]
     stdev_cube.attributes["STASH"] = iris.fileformats.pp.STASH.from_msi("m01s00i275")
     filler(stdev_cube)
 

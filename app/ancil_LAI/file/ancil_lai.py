@@ -123,6 +123,7 @@ def main(sources, relative_weights_path, output_filepath, netcdf_only):
         lai_slice = lai_tar[time_step].copy(lai_tar.data[time_step])
         nfiller(lai_slice)
 
+    
     save.netcdf(lai_tar, output_filepath)
     if not netcdf_only:
         save.ancil(lai_tar, output_filepath)

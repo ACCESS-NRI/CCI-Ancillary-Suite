@@ -296,17 +296,16 @@ def main(filt_source, target, meanname, output, mean_orography_output, netcdf_on
     operation = functools.partial(calc_fields, mean, polar_cutoff)
 
     results = decomp.decompose(operation, source_smg, ocean)
-    print(results)
 
     save.netcdf(results, output)
-    if netcdf_only:
+    if not netcdf_only:
         save.ancil(results, output)
 
     # separately save mean after ocean mask
     orography_utils.make_consistent_with_mask(mean, ocean)
 
     save.netcdf(mean, mean_orography_output)
-    if netcdf_only:
+    if not netcdf_only:
         save.ancil(mean, mean_orography_output)
 
 

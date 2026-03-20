@@ -99,4 +99,4 @@ if __name__ == '__main__':
     args = parser.parse_args()
     tree_ids = [int(tree_id) for tree_id in args.tree_ids.split(',')]
     main(args.sources, args.trees_dataset, args.canopy_height_factors,
-         tree_ids, args.output, False)
+         tree_ids, args.output, args.netcdf_only)
