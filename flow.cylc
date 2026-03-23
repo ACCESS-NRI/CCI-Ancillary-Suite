@@ -120,6 +120,10 @@
 	[[ancil_soil_hydrology]]
 		inherit = PBS_medium_parallel
 		script = rose task-run
+		init-script = """
+			module use /g/data/access/ngm/modules
+			module load ants/1.1.0
+		"""
 
 	[[ancil_topographic_index]]
 		inherit = PBS_medium_parallel
