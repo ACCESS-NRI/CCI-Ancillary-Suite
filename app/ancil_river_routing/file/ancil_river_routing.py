@@ -133,10 +133,10 @@ def fix_nans(lcf_cube):
 
 
 def load_data(source, land_cover_fraction):
-    sequence_cube, direction_cube = ants.load_cubes(
+    sequence_cube, direction_cube = ants.io.load.load_cubes(
         source, ["river_routing_sequence", "river_routing_direction"]
     )
-    lcf_cube = ants.load_cube(land_cover_fraction, "land_area_fraction")
+    lcf_cube = ants.io.load.load_cube(land_cover_fraction, "land_area_fraction")
 
     return sequence_cube, direction_cube, lcf_cube
 
