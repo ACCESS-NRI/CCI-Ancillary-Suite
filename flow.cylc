@@ -62,19 +62,18 @@
 			{% endif %}	
 
 	[[ancil_lct]]
-        script = rose task-run
+		{% if GRID_SOURCE == "grid_definition" %}
+			script = rose task-run --command-key=grid_source
+		{% elif GRID_SOURCE == "land_sea_mask" %}
+			script = rose task-run --command-key=lsm_source
+		{% endif %}
 		inherit = PBS_medium_parallel
 		init-script = """
 			module use /g/data/access/ngm/modules
 			module load ants/1.1.0
 		"""
 		[[[environment]]]
-			{% if GRID_SOURCE == "grid_definition" %}
-				GRID_ARG = "--target-grid={{ GRID_FILE }}"
-			{% elif GRID_SOURCE == "land_sea_mask" %}
-				GRID_ARG = "--target-lsm={{ GRID_FILE }}"
-			{% endif %}
-
+                        GRID_FILE = {{ GRID_FILE }}
 			{% if LAND_MODEL == "CABLE" %}
 				DEFAULT_TRANSFORM = "cci2cable.json"
 			{% elif LAND_MODEL == "JULES" %}

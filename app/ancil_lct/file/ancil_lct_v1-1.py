@@ -133,7 +133,7 @@ def load_data(
     if target_grid:
         target_cube = ants.load_grid(target_grid)
     else:
-        target_cube = ants.load_landsea_mask(
+        target_cube = ants.fileformats.load_landsea_mask(
             target_landseamask, land_fraction_threshold
         )
 
