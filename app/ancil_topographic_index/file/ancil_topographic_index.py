@@ -110,7 +110,7 @@ def main(source_path, lct_path, output_filepath, ice_tile_id, netcdf_only):
     cubes = topographic_index(source, lct, ice_tile_id)
 
     save.netcdf(cubes, output_filepath)
-    if netcdf_only:
+    if not netcdf_only:
         save.ancil(cubes, output_filepath)
 
     return cubes

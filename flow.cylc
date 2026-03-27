@@ -117,7 +117,7 @@
 			{% endif %}
 
 	[[ancil_canopy_height]]
-		inherit = PBS_medium_serial
+		inherit = PBS_large_serial
 		script = rose task-run
 		[[[environment]]]
 			{% if LAND_MODEL == "CABLE" %}
@@ -198,11 +198,11 @@
 			CALENDAR = {{ CALENDAR }}
 
 	[[regrid_aerosol]]
-		inherit = PBS_medium_serial
+		inherit = PBS_medium_parallel
 		script = rose task-run
 
 	[[regrid_ozone]]
-		inherit = PBS_medium_serial
+		inherit = PBS_medium_parallel
 		script = rose task-run
 
 	[[ancil_radiation_parameters]]
