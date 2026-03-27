@@ -107,7 +107,7 @@ def main(sources, target, output, netcdf_only):
     set_sea_points(half_height_result, ocean)
 
     save.netcdf([silhouette_result, half_height_result], output)
-    if netcdf_only:
+    if not netcdf_only:
         save.ancil([silhouette_result, half_height_result], output)
 
 

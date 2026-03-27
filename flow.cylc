@@ -197,7 +197,7 @@
 			CALENDAR = {{ CALENDAR }}
 
 	[[regrid_aerosol]]
-		inherit = PBS_medium_parallel
+		inherit = PBS_large_parallel
 		script = rose task-run
 
 	[[regrid_ozone]]
