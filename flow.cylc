@@ -42,7 +42,6 @@
 			module use /g/data/xp65/public/modules
 			module load conda/analysis3-25.08
 			module load nco
-                        module load netcdf
 		"""
 		[[[environment]]]
 			ANCIL_TARGET_PATH="/scratch/{{ STORAGE_PROJECT }}/${USER}/cylc-run/${CYLC_SUITE_NAME}/share/data"
@@ -50,8 +49,8 @@
 			ANCIL_PREPROC_PATH="/g/data/access/TIDS/RMED/ANTS/preproc"
 			CALENDAR={{ CALENDAR }}
 			RESOLUTION={{ RESOLUTION }}
-                        TARGET_LSM=${ANCIL_TARGET_PATH}/land_sea_mask/qrparm.mask
-                        TARGET_OROGRAPHIC_LSM=${ANCIL_TARGET_PATH}/orography/qrparm.orog_wavedrag
+			TARGET_LSM=${ANCIL_TARGET_PATH}/land_sea_mask/qrparm.mask
+			TARGET_OROGRAPHIC_LSM=${ANCIL_TARGET_PATH}/orography/qrparm.orog_wavedrag
 			{% if LAND_MODEL == "CABLE" %}
 				MODEL_ICE_TILE = 17
 				MODEL_SOIL_TILE = 14
@@ -79,7 +78,7 @@
 			script = rose task-run --command-key=grid_source
 		{% elif GRID_SOURCE == "land_sea_mask" %}
 			script = rose task-run --command-key=lsm_source
-                {% elif GRID_SOURCE == "ocean_mesh" %}
+		{% elif GRID_SOURCE == "ocean_mesh" %}
 			script = rose task-run --command-key=lsm_source
 		{% endif %}
 		inherit = PBS_medium_parallel
