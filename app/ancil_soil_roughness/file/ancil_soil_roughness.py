@@ -53,7 +53,7 @@ def main(source_path, lai_path, target_lsm, outfile, netcdf_only):
     res = decomp.decompose(gen_soil_roughness, [z0_src, lai], lsm)
 
     save.netcdf(res, outfile)
-    if netcdf_only:
+    if not netcdf_only:
         save.ancil(res, outfile)
 
 

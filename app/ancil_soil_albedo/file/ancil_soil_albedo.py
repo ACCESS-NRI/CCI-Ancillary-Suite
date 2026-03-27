@@ -81,7 +81,7 @@ def main(source_path, lct_filepath, ice_tile_id, output_filepath, netcdf_only):
     make_consistent_lct(albedo, lct, ice_tile_id)
 
     save.netcdf(albedo, output_filepath)
-    if netcdf_only:
+    if not netcdf_only:
         save.ancil(albedo, output_filepath)
 
     return albedo

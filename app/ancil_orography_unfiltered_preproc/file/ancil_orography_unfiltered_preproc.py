@@ -24,7 +24,7 @@ def main(sources, output, netcdf_only):
     source.attributes["STASH"] = iris.fileformats.pp.STASH.from_msi("m01s00i007")
 
     save.netcdf(source, output)
-    if netcdf_only:
+    if not netcdf_only:
         save.ancil(source, output)
 
     return source

@@ -26,7 +26,7 @@ def main(sources, output, netcdf_only):
     source.rename("surface_altitude_filtered")
 
     save.netcdf(source, output)
-    if netcdf_only:
+    if not netcdf_only:
         save.ancil(source, output)
 
     return source

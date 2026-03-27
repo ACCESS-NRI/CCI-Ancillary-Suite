@@ -127,7 +127,7 @@ def main(sources, target, output, netcdf_only):
     results = [mean] + results_slopes
 
     save.netcdf(results, output)
-    if netcdf_only:
+    if not netcdf_only:
         save.ancil(results, output)
 
     return results
