@@ -74,7 +74,7 @@
                         OCEAN_MESH = {{ GRID_FILE }}
 
 	[[ancil_lct]]
-		{% if GRID_SOURCE == "grid_definition" %}
+		{% if GRID_SOURCE == "land_cover" %}
 			script = rose task-run --command-key=grid_source
 		{% elif GRID_SOURCE == "land_sea_mask" %}
 			script = rose task-run --command-key=lsm_source
