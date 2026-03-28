@@ -168,8 +168,6 @@ def create_um_mesh(nlat, nlon):
       attrs=dict(gridType="unstructured mesh")
     )
 
-    um_mesh_ds.to_netcdf('um_mesh.nc')
-
     um_mesh = esmpy.api.mesh.Mesh(
     filename='um_mesh.nc',
     filetype=esmpy.api.constants.FileFormat.ESMFMESH
