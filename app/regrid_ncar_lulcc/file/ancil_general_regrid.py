@@ -33,6 +33,7 @@ import ants.decomposition as decomp
 import ants.io.save as save
 import ants.utils
 from ants.utils.cube import create_time_constrained_cubes
+import iris
 
 
 def load_data(
@@ -54,6 +55,22 @@ def load_data(
         )
     return source_cubes, target_cube
 
+def fix_metadata(source_cubes, target_cube):
+    """
+    Fix the coordinate metadata on the cubes to assume that they use GeogCS coordinates.
+    """
+
+    default_cs = iris.coord_systems.GeogCS(ants.coord_systems.EARTH_RADIUS)
+    for cube in source_cubes:
+        for coord in cube.dim_coords:
+            coord_name = coord.name()
+            if cube.coord(coord_name).coord_system is None:
+                cube.coord(coord_name).coord_system = default_cs
+            
+    for coord in target_cube.dim_coords:
+        coord_name = coord.name()
+        if target_cube.coord(coord_name).coord_system is None:
+            target_cube.coord(coord_name).coord_system = default_cs
 
 def regrid(sources, target):
     sources = ants.utils.cube.as_cubelist(sources)
@@ -138,6 +155,8 @@ def main(
             "Target appears to be a UGrid mesh - the regrid to mesh application in "
             "UG-ANTS should be used instead."
         )
+
+    fix_metadata(source_cubes, target_cube)
 
     regridded_cubes = decomp.decompose(regrid, source_cubes, target_cube)
     if target_lsm_path:

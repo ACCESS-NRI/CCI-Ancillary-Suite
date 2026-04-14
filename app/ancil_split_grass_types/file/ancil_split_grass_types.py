@@ -1,4 +1,7 @@
 import ants
+import json
+import numpy
+import scipy
 
 # This script uses an external dataset to split a generic grass type from a
 # source land fractions using an external dataset. The process is split into 3
@@ -42,9 +45,14 @@ def process_grass_mapping(grass_mapping_file):
     indexing.
     """
 
-    for k, v in grass_mapping:
+    with open(grass_mapping_file, 'r') as f:
+        grass_mapping = json.load(f)
+
+    # We want to rewrite the keys and values to be integers- make a copy dict
+    int_grass_mapping = {}
+    for k, v in grass_mapping.items():
         try:
-            k = int(k) + 1
+            k = int(k) - 1
         except:
             ValueError(f'The mapping key {k} could not be cast to an int')
 
@@ -53,14 +61,13 @@ def process_grass_mapping(grass_mapping_file):
 
         for i in range(len(v)):
             try:
-                v[i] = int(v[i]) + 1
+                v[i] = int(v[i]) - 1
             except:
                 ValueError(f'The value {v} could not be cast to an int')
 
-        grass_mapping.pop(k)
-        grass_mapping[k] = v
+        int_grass_mapping[k] = v
 
-    return grass_mapping
+    return int_grass_mapping
         
 def load_data(grass_source, orig_fractions):
     """
@@ -80,7 +87,7 @@ def preprocess_grass_source(grasses, grass_mapping):
     # Prepare the condensed fractions- same land shape, with one page for each
     # entry in the mapping dict.
     condensed_data = numpy.ndarray(
-        (len(grass_mapping, *grass_data.shape(1:)),
+        (len(grass_mapping), *grasses.data.shape[1:]),
         dtype=float
         )
 
@@ -88,7 +95,18 @@ def preprocess_grass_source(grasses, grass_mapping):
         condensed_data[target_ind, :, :] = numpy.sum(grasses.data[source_inds, :, :], axis=0)
 
     # Now normalise to that the fractions along the tile axis sum to 1.0
-    condensed_data /= numpy.sum(condensed_data, axis=0)
+    net_fractions = numpy.sum(condensed_data, axis=0)
+
+    condensed_data /= net_fractions
+
+    # This will result in a nan wherever the NCAR thought there was no grass.
+    # We don't want to apply this to the original fractions- the assumption we
+    # made was that CCI will determine how much grass there is, and NCAR splits
+    # it, so we should keep to that rule. So we will fill in the NaN entries
+    # that resulted from zero fractions using nearest neighbour.
+    mask = numpy.where(~numpy.isnan(condensed_data))
+    interp = scipy.interpolate.NearestNDInterpolator(mask, condensed_data[mask])
+    condensed_data = interp(*numpy.indices(condensed_data.shape))
 
     return condensed_data
 
@@ -106,6 +124,9 @@ def apply_grass_fractions(orig_fractions, grass_fractions, grass_mapping):
     for source_ind, target_ind in enumerate(orig_grass_ids):
         orig_fractions.data[target_ind, :, :] = grass_fractions[source_ind, :, :] * orig_grasses
 
+    # We also need to think about what happens when the CCI fractions say there
+    # is grass, but the NCAR fractions say there is none. At this stage, it
+    # will end up removing all the grass without compensating the other types.
     return orig_fractions
 
 def main(grass_source, original_fractions, mapping_file, output, netcdf_only):
@@ -124,14 +145,14 @@ def main(grass_source, original_fractions, mapping_file, output, netcdf_only):
         grass_mapping
         )
 
-    ants.io.save.netcdf(new_fractions)
+    ants.io.save.netcdf(new_fractions, output)
     if not netcdf_only:
-        ants.io.save.ancil(new_fractions)
+        ants.io.save.ancil(new_fractions, output)
 
 if __name__ == '__main__':
-    args = _get_parser.parse_args()
+    args = _get_parser().parse_args()
     main(
-            args.source,
+            args.sources,
             args.original_fractions,
             args.grass_mapping,
             args.output,
