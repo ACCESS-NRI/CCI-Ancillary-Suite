@@ -144,7 +144,7 @@
 		script = rose task-run
 
 	[[ancil_soil_hydrology]]
-		inherit = PBS_medium_parallel
+		inherit = PBS_long_parallel
 		script = rose task-run
 		init-script = """
 			module use /g/data/access/ngm/modules
