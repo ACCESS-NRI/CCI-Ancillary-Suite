@@ -158,7 +158,8 @@ def main(
 
     fix_metadata(source_cubes, target_cube)
 
-    regridded_cubes = decomp.decompose(regrid, source_cubes, target_cube)
+    regridded_cubes = regrid(source_cubes, target_cube)
+    # regridded_cubes = decomp.decompose(regrid, source_cubes, target_cube)
     if target_lsm_path:
         ants.analysis.make_consistent_with_lsm(
             regridded_cubes, target_cube, invert_mask, search_method

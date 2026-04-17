@@ -102,7 +102,7 @@
 		script = rose task-run
 
 	[[regrid_ncar_lulcc]]
-		inherit = PBS_medium_parallel
+		inherit = PBS_medium_serial
 		script = rose task-run
 
 	[[ancil_split_grass_types]]
@@ -110,9 +110,9 @@
 		script = rose task-run
 		[[[environment]]]
 			{% if LAND_MODEL == "CABLE" %}
-				DEFAULT_MAPPING = "ncar_grass_cable"
+				DEFAULT_MAPPING = "ncar_grass_cable.json"
 			{% elif LAND_MODEL == "JULES" %}
-				DEFAULT_MAPPING = "ncar_grass_jules"
+				DEFAULT_MAPPING = "ncar_grass_jules.json"
 			{% endif %}
 
 	[[regrid_LAI]]
