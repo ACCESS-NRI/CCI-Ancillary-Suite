@@ -11,17 +11,17 @@
 			{% if GRID_SOURCE == "ocean_mesh" %}
 				landseamask_from_ocean_mesh => ancil_lct
 			{% endif %}
-			ancil_lct => regrid_C4_fraction => ancil_C4_fraction
+			ancil_lct => regrid_ncar_lulcc => ancil_split_grass_types
 			ancil_lct => regrid_LAI
-			(ancil_C4_fraction & regrid_LAI) => ancil_LAI
+			(ancil_split_grass_types & regrid_LAI) => ancil_LAI
 			ancil_LAI => ancil_canopy_height
 			(ancil_LAI & ancil_canopy_height) => merge_veg_func
-			ancil_C4_fraction => ancil_soil_hydrology
-			ancil_C4_fraction => ancil_topographic_index
+			ancil_split_grass_types => ancil_soil_hydrology
+			ancil_split_grass_types => ancil_topographic_index
 			ancil_lct => regrid_albedo
-			(ancil_C4_fraction & regrid_albedo) => ancil_soil_albedo
+			(ancil_split_grass_types & regrid_albedo) => ancil_soil_albedo
 			(ancil_soil_hydrology & ancil_soil_albedo) => merge_soils
-			(ancil_C4_fraction & merge_soils) => ancil_soil_dust
+			(ancil_split_grass_types & merge_soils) => ancil_soil_dust
 			(ancil_lct & ancil_LAI) => ancil_soil_roughness
 			(ancil_orographic_formdrag_preproc & ancil_lct) => ancil_orographic_formdrag
 			(ancil_lct & ancil_orography_unfiltered_preproc) => ancil_orography_mean => ancil_orographic_wavedrag
@@ -101,6 +101,20 @@
 		inherit = PBS_medium_parallel
 		script = rose task-run
 
+	[[regrid_ncar_lulcc]]
+		inherit = PBS_medium_serial
+		script = rose task-run
+
+	[[ancil_split_grass_types]]
+		inherit = PBS_medium_serial
+		script = rose task-run
+		[[[environment]]]
+			{% if LAND_MODEL == "CABLE" %}
+				DEFAULT_MAPPING = "ncar_grass_cable.json"
+			{% elif LAND_MODEL == "JULES" %}
+				DEFAULT_MAPPING = "ncar_grass_jules.json"
+			{% endif %}
+
 	[[regrid_LAI]]
 		inherit = PBS_medium_parallel
 		script = rose task-run
@@ -130,7 +144,7 @@
 		script = rose task-run
 
 	[[ancil_soil_hydrology]]
-		inherit = PBS_medium_parallel
+		inherit = PBS_long_parallel
 		script = rose task-run
 		init-script = """
 			module use /g/data/access/ngm/modules
