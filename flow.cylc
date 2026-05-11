@@ -89,6 +89,9 @@
 		[[[environment]]]
 			{% if LAND_MODEL == "CABLE" %}
 				DEFAULT_TRANSFORM = "cci2cable.json"
+				{% if URBAN == "true" %}
+					DEFAULT_TRANSFORM = "cci2cable_urban.json"
+				{% endif %}
 			{% elif LAND_MODEL == "JULES" %}
 				DEFAULT_TRANSFORM = "cci2jules.json"
 			{% endif %}
