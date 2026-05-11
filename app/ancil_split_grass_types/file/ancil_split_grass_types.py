@@ -92,9 +92,7 @@ def preprocess_grass_source(grasses, grass_mapping):
         )
 
     for target_ind, (_, source_inds) in enumerate(grass_mapping.items()):
-        condensed_data[target_ind, :, :] = numpy.sum(
-                grasses.data[source_inds, :, :], axis=0
-                )
+        condensed_data[target_ind, :, :] = numpy.sum(grasses.data[source_inds, :, :], axis=0)
 
     # Now normalise to that the fractions along the tile axis sum to 1.0
     net_fractions = numpy.sum(condensed_data, axis=0)
@@ -107,10 +105,7 @@ def preprocess_grass_source(grasses, grass_mapping):
     # it, so we should keep to that rule. So we will fill in the NaN entries
     # that resulted from zero fractions using nearest neighbour.
     mask = numpy.where(~numpy.isnan(condensed_data))
-    interp = scipy.interpolate.NearestNDInterpolator(
-            mask,
-            condensed_data[mask]
-            )
+    interp = scipy.interpolate.NearestNDInterpolator(mask, condensed_data[mask])
     condensed_data = interp(*numpy.indices(condensed_data.shape))
 
     return condensed_data
@@ -127,8 +122,7 @@ def apply_grass_fractions(orig_fractions, grass_fractions, grass_mapping):
     orig_grasses = numpy.sum(orig_fractions.data[orig_grass_ids, :, :], axis=0)
 
     for source_ind, target_ind in enumerate(orig_grass_ids):
-        orig_fractions.data[target_ind, :, :] = \
-                grass_fractions[source_ind, :, :] * orig_grasses
+        orig_fractions.data[target_ind, :, :] = grass_fractions[source_ind, :, :] * orig_grasses
 
     # We also need to think about what happens when the CCI fractions say there
     # is grass, but the NCAR fractions say there is none. At this stage, it
@@ -140,9 +134,11 @@ def main(grass_source, original_fractions, mapping_file, output, netcdf_only):
     Reprocess the grass fractions in the original fractions.
     """
     grass_mapping = process_grass_mapping(mapping_file)
+    print(f'The generated grass mapping: {grass_mapping}')
     grass_source, orig_fractions = load_data(grass_source, original_fractions)
     
     grass_fractions = preprocess_grass_source(grass_source, grass_mapping)
+    print(f'The shape of the processed grass fractions: {grass_fractions.shape}')
     new_fractions = apply_grass_fractions(
         orig_fractions,
         grass_fractions,
