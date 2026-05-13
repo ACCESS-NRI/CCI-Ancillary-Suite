@@ -6,9 +6,9 @@
 			-P = {{ COMPUTE_PROJECT }}
 			-l ncpus=1
 			-l mem=10GB
-			-l walltime=1:00:00
+			-l walltime=2:00:00
 			-l jobfs=10GB
-			-l storage=gdata/hr22+gdata/xp65+gdata/vk83+gdata/access+gdata/{{ STORAGE_PROJECT }}+scratch/{{ STORAGE_PROJECT }}
+			-l storage=gdata/hr22+gdata/xp65+gdata/vk83+gdata/access+gdata/{{ STORAGE_PROJECT }}+scratch/{{ STORAGE_PROJECT }}+gdata/${PROJECT}+scratch/${PROJECT}
 
   [[PBS_medium_serial]]
     platform = pbs
@@ -17,9 +17,9 @@
 			-P = {{ COMPUTE_PROJECT }}
 			-l ncpus=1
 			-l mem=50GB
-			-l walltime=1:00:00
+			-l walltime=2:00:00
 			-l jobfs=50GB
-			-l storage=gdata/hr22+gdata/xp65+gdata/vk83+gdata/access+gdata/{{ STORAGE_PROJECT }}+scratch/{{ STORAGE_PROJECT }}
+			-l storage=gdata/hr22+gdata/xp65+gdata/vk83+gdata/access+gdata/{{ STORAGE_PROJECT }}+scratch/{{ STORAGE_PROJECT }}+gdata/${PROJECT}+scratch/${PROJECT}
     
 	[[PBS_large_serial]]
     platform = pbs
@@ -28,9 +28,9 @@
 			-P = {{ COMPUTE_PROJECT }}
 			-l ncpus=1
 			-l mem=100GB
-			-l walltime=10:00:00
+			-l walltime=2:00:00
 			-l jobfs=100GB
-			-l storage=gdata/hr22+gdata/xp65+gdata/vk83+gdata/access+gdata/{{ STORAGE_PROJECT }}+scratch/{{ STORAGE_PROJECT }}
+			-l storage=gdata/hr22+gdata/xp65+gdata/vk83+gdata/access+gdata/{{ STORAGE_PROJECT }}+scratch/{{ STORAGE_PROJECT }}+gdata/${PROJECT}+scratch/${PROJECT}
 
 	[[PBS_small_parallel]]
     platform = pbs
@@ -39,10 +39,21 @@
 			-P = {{ COMPUTE_PROJECT }}
 			-l ncpus=4
 			-l mem=50GB
-			-l walltime=10:00:00
+			-l walltime=2:00:00
 			-l jobfs=50GB
-			-l storage=gdata/hr22+gdata/xp65+gdata/vk83+gdata/access+gdata/{{ STORAGE_PROJECT }}+scratch/{{ STORAGE_PROJECT }}
+			-l storage=gdata/hr22+gdata/xp65+gdata/vk83+gdata/access+gdata/{{ STORAGE_PROJECT }}+scratch/{{ STORAGE_PROJECT }}+gdata/${PROJECT}+scratch/${PROJECT}
 	[[PBS_medium_parallel]]
+    platform = pbs
+		[[[directives]]]
+			-q = normal
+			-P = {{ COMPUTE_PROJECT }}
+			-l ncpus=10
+			-l mem=50GB
+			-l walltime=4:00:00
+			-l jobfs=50GB
+			-l storage=gdata/hr22+gdata/xp65+gdata/vk83+gdata/access+gdata/{{ STORAGE_PROJECT }}+scratch/{{ STORAGE_PROJECT }}+gdata/${PROJECT}+scratch/${PROJECT}
+  
+	[[PBS_long_parallel]]
     platform = pbs
 		[[[directives]]]
 			-q = normal
@@ -51,7 +62,7 @@
 			-l mem=50GB
 			-l walltime=10:00:00
 			-l jobfs=50GB
-			-l storage=gdata/hr22+gdata/xp65+gdata/vk83+gdata/access+gdata/{{ STORAGE_PROJECT }}+scratch/{{ STORAGE_PROJECT }}
+			-l storage=gdata/hr22+gdata/xp65+gdata/vk83+gdata/access+gdata/{{ STORAGE_PROJECT }}+scratch/{{ STORAGE_PROJECT }}+gdata/${PROJECT}+scratch/${PROJECT}
   
 	[[PBS_large_parallel]]
     platform = pbs
@@ -60,9 +71,9 @@
       -P = {{ COMPUTE_PROJECT }}
 			-l ncpus=20
 			-l mem=100GB
-			-l walltime=10:00:00
+			-l walltime=4:00:00
 			-l jobfs=100GB
-			-l storage=gdata/hr22+gdata/xp65+gdata/vk83+gdata/access+gdata/{{ STORAGE_PROJECT }}+scratch/{{ STORAGE_PROJECT }}
+			-l storage=gdata/hr22+gdata/xp65+gdata/vk83+gdata/access+gdata/{{ STORAGE_PROJECT }}+scratch/{{ STORAGE_PROJECT }}+gdata/${PROJECT}+scratch/${PROJECT}
   
 	[[PBS_huge_serial]]
 		platform = pbs
@@ -73,7 +84,7 @@
 			-l mem=500GB
 			-l walltime=4:00:00
 			-l jobfs=100GB
-			-l storage=gdata/hr22+gdata/xp65+gdata/vk83+gdata/access+gdata/{{ STORAGE_PROJECT }}+scratch/{{ STORAGE_PROJECT }}
+			-l storage=gdata/hr22+gdata/xp65+gdata/vk83+gdata/access+gdata/{{ STORAGE_PROJECT }}+scratch/{{ STORAGE_PROJECT }}+gdata/${PROJECT}+scratch/${PROJECT}
 
 	[[PBS_huge_parallel]]
 		platform = pbs
@@ -84,4 +95,4 @@
 			-l mem=1000GB
 			-l walltime=4:00:00
 			-l jobfs=100GB
-			-l storage=gdata/hr22+gdata/xp65+gdata/vk83+gdata/access+gdata/{{ STORAGE_PROJECT }}+scratch/{{ STORAGE_PROJECT }}
+			-l storage=gdata/hr22+gdata/xp65+gdata/vk83+gdata/access+gdata/{{ STORAGE_PROJECT }}+scratch/{{ STORAGE_PROJECT }}+gdata/${PROJECT}+scratch/${PROJECT}
