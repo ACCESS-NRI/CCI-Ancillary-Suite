@@ -11,6 +11,7 @@
 			{% if GRID_SOURCE == "ocean_mesh" %}
 				landseamask_from_ocean_mesh => ancil_lct
 			{% endif %}
+                        preproc_CCI_water => ancil_lct
 			ancil_lct => regrid_C4_fraction => ancil_C4_fraction
 			ancil_lct => regrid_LAI
 			(ancil_C4_fraction & regrid_LAI) => ancil_LAI
@@ -73,6 +74,12 @@
                 [[[environment]]]
                         OCEAN_MESH = {{ GRID_FILE }}
 
+        [[preprocess_CCI_water]]
+                script = rose task-run
+                inherit = PBS_huge_serial
+                [[[environment]]]
+                        CCI_year = {{ CCI_YEAR }}
+ 
 	[[ancil_lct]]
 		{% if GRID_SOURCE == "land_cover" %}
 			script = rose task-run --command-key=grid_source
