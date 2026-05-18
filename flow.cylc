@@ -11,8 +11,8 @@
 			{% if GRID_SOURCE == "ocean_mesh" %}
 				landseamask_from_ocean_mesh => ancil_lct
 			{% endif %}
-                        preproc_CCI_water => ancil_lct
-			ancil_lct => regrid_ncar_lulcc => ancil_split_grass_types
+                        preprocess_CCI_water => ancil_lct
+			ancil_lct => ancil_fix_antarctic_permanent_ice => regrid_ncar_lulcc => ancil_split_grass_types
 			ancil_lct => regrid_LAI
 			(ancil_split_grass_types & regrid_LAI) => ancil_LAI
 			ancil_LAI => ancil_canopy_height
@@ -78,7 +78,7 @@
                 script = rose task-run
                 inherit = PBS_huge_serial
                 [[[environment]]]
-                        CCI_year = {{ CCI_YEAR }}
+                        CCI_YEAR = {{ CCI_YEAR }}
  
 	[[ancil_lct]]
 		{% if GRID_SOURCE == "land_cover" %}
@@ -107,6 +107,10 @@
 	[[ancil_C4_fraction]]
 		inherit = PBS_medium_parallel
 		script = rose task-run
+
+        [[ancil_fix_antarctic_permanent_ice]]
+                inherit = PBS_medium_serial
+                script = rose task-run
 
 	[[regrid_ncar_lulcc]]
 		inherit = PBS_medium_serial
