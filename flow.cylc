@@ -12,7 +12,8 @@
 				landseamask_from_ocean_mesh => ancil_lct
 			{% endif %}
 			preprocess_CCI_water => ancil_lct
-			ancil_lct => ancil_fix_antarctic_permanent_ice => regrid_ncar_lulcc => ancil_split_grass_types
+			ancil_lct => ancil_fix_antarctic_permanent_ice
+			(ancil_fix_antarctic_permanent_ice & regrid_ncar_lulcc) => ancil_split_grass_types
 			ancil_lct => regrid_LAI
 			(ancil_split_grass_types & regrid_LAI) => ancil_LAI
 			ancil_LAI => ancil_canopy_height
@@ -96,6 +97,9 @@
 		[[[environment]]]
 			{% if LAND_MODEL == "CABLE" %}
 				DEFAULT_TRANSFORM = "cci2cable.json"
+				{% if URBAN == "true" %}
+					DEFAULT_TRANSFORM = "cci2cable_urban.json"
+				{% endif %}
 			{% elif LAND_MODEL == "JULES" %}
 				DEFAULT_TRANSFORM = "cci2jules.json"
 			{% endif %}
