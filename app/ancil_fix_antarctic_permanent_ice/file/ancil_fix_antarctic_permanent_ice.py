@@ -12,17 +12,12 @@
 
 import argparse
 import ants
+import numpy
 
 def _parse_args():
-    parser = argparse.ArgumentParser("""Script to set all vegetation below -60
-            latitude to permanent ice.""")
-
-    parser.add_argument(
-            '-i',
-            '--input',
-            type=str,
-            required=True,
-            help='Target vegetation_area_fractions to convert.'
+    parser = ants.AntsArgParser(
+            target_lsm=False,
+            target_grid=False
             )
 
     parser.add_argument(
@@ -30,14 +25,6 @@ def _parse_args():
             type=int,
             default=9,
             help='Which tile ID is the model ice tile?'
-            )
-
-    parser.add_argument(
-            '-o',
-            '--output',
-            type=str,
-            required=True,
-            help='Filename to write to.'
             )
 
     return parser.parse_args()
@@ -48,20 +35,22 @@ def convert_to_ice(veg_frac, ice_tile_id):
     100% ice (where land).
     """
 
-    # ANTS uses a float NaN of very large- so filter by only selecting lower
-    # than a value. Take the original mask, which masks out the ocean, and then
-    # add the latitude and tile specific mask to allow masked indexing.
-    ice_mask = c.data.mask.copy
+    # We want to create a mask which sets only the ice tile below -60 latitude to
+    # 1.0, and every other land point below -60 latitude to 0.0.
+    land_mask = numpy.sum(veg_frac.data, axis=0) > 0.0
     lat_mask = veg_frac.coord('latitude').points > -60
-    ice_tile = veg_frac.coord('pseudo_level').points == ice_tile_id
-    ice_mask[~ice_tile, lat_mask, :] = True
-    nonice_mask[ice_tile, lat_mask, :] = True
+    land_mask[lat_mask, :] = False
     
-    veg_frac.data[~ice_mask] = 1.0
-    veg_frac.data[~nonice_mask] = 0.0
+    ice_tile_mask = veg_frac.coord('pseudo_level').points.data == 17
+
+    ice_mask = ice_tile_mask[:, None, None] & land_mask[None, :, :]
+    nonice_mask = ~ice_tile_mask[:, None, None] & land_mask[None, :, :]
+
+    veg_frac.data[ice_mask] = 1.0
+    veg_frac.data[nonice_mask] = 0.0
     return veg_frac
 
-def main(veg_fractions_file, ice_tile, output):
+def main(veg_fractions_file, ice_tile, output, netcdf_only):
     vegetation_fractions = ants.load_cube(
             veg_fractions_file,
             'vegetation_area_fraction'
@@ -75,4 +64,4 @@ def main(veg_fractions_file, ice_tile, output):
 
 if __name__ == '__main__':
     args = _parse_args()
-    main(args.input, args.ice_tile, args.output)
+    main(args.sources, args.ice_tile_id, args.output, args.netcdf_only)
