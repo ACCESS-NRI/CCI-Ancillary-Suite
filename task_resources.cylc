@@ -84,7 +84,7 @@
 			-l mem=500GB
 			-l walltime=4:00:00
 			-l jobfs=100GB
-			-l storage=gdata/hr22+gdata/xp65+gdata/vk83+gdata/access+gdata/{{ STORAGE_PROJECT }}+scratch/{{ STORAGE_PROJECT }}
+			-l storage=gdata/hr22+gdata/xp65+gdata/vk83+gdata/access+gdata/cm45+gdata/{{ STORAGE_PROJECT }}+scratch/{{ STORAGE_PROJECT }}
 
 	[[PBS_huge_parallel]]
 		platform = pbs
