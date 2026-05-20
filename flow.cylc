@@ -12,6 +12,7 @@
 				landseamask_from_ocean_mesh => ancil_lct
 			{% endif %}
 			preprocess_CCI_water => ancil_lct
+			ancil_lct => regrid_ncar_lulcc
 			ancil_lct => ancil_fix_antarctic_permanent_ice
 			(ancil_fix_antarctic_permanent_ice & regrid_ncar_lulcc) => ancil_split_grass_types
 			ancil_lct => regrid_LAI
