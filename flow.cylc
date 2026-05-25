@@ -52,6 +52,7 @@
 			ANCIL_PREPROC_PATH="/g/data/access/TIDS/RMED/ANTS/preproc"
 			CALENDAR={{ CALENDAR }}
 			RESOLUTION={{ RESOLUTION }}
+            VERTICAL_DISCRETIZATION={{ VERTICAL_DISCRETIZATION }}
 			TARGET_LSM=${ANCIL_TARGET_PATH}/land_sea_mask/qrparm.mask
 			TARGET_OROGRAPHIC_LSM=${ANCIL_TARGET_PATH}/orography/qrparm.orog_wavedrag
 			{% if LAND_MODEL == "CABLE" %}
