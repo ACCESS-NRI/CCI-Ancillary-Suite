@@ -10,15 +10,15 @@ def _parse_args():
             resolution, while the permanent water is at 150m resolution."""
             )
     parser.add_argument(
-            '--land-cover',
+            '--CCI-land-cover',
             type=str,
-            help='Source land cover dataset',
+            help='Source CCI land cover dataset',
             required=True
             )
     parser.add_argument(
-            '--water-bodies',
+            '--CCI-water-dir',
             type=str,
-            help='Source water bodies dataset',
+            help='Directory containing the CCI water bodies sources',
             required=True
             )
     parser.add_argument(
@@ -31,16 +31,17 @@ def _parse_args():
     return parser.parse_args()
 
 
-def main(land_cover_source, water_bodies_source, output):
+def main(land_cover_source, water_bodies_dir, output):
     # Load in the data sources
     land_cover = xarray.open_dataset(land_cover_source)
-    water_bodies = xarray.open_dataset(water_bodies_source)
 
-    upscaled_water_bodies = upscale_water_bodies(water_bodies)
-    print("Finished upscaling the water bodies dataset")
+    # The water bodies have 2 datasets which have fixed names
+    ocean_water = xarray.open_dataset(water_bodies_dir + 'ESACCI-LC-L4-WB-Ocean-Map-150m-P13Y-2000-v4.0.tif')
+    all_water = xarray.open_dataset(water_bodies_dir + 'ESACCI-LC-L4-WB-Map-150m-P13Y-2000-v4.0.tif')
+
+    upscaled_water_bodies = upscale_water_bodies(ocean_water, all_water)
 
     land_cover = overlay_water_on_land_cover(upscaled_water_bodies, land_cover)
-    print("Finished overlaying the permanent water on CCI")
 
     land_cover = drop_unnecessary_data(land_cover)
     add_coord_system(land_cover)
@@ -49,21 +50,28 @@ def main(land_cover_source, water_bodies_source, output):
     land_cover.to_netcdf(output)
 
 
-def load_data(sources):
-    # Expect sources to be a list of two strings, describing the land cover
-    # and water body datasets
-    land_cover = ants.io.load.load_cube(sources[0], "land_cover_lccs")
-    water_bodies = ants.io.load.load_cube(sources[1], "water_classification")
-
-    return land_cover, water_bodies
-
-
-def upscale_water_bodies(water_bodies):
+def upscale_water_bodies(ocean_water, all_water):
     """
-    Upscale the provided water bodies dataset at 150m resolution to 300m
-    resolution. The water bodies dataset is a categorical dataset, with
-    0=ocean, 1=land, 2=inland_water.
+    Combine and upscale the provided water bodies dataset to create a single
+    dataset at the desired 300m resolution, which differentiates between ocean
+    and inland water. Returned dataset has 0 for ocean, 1 for land, 2 for
+    inland water.
     """
+
+    # First, combine the datasets to differentiate between ocean and inland
+    # water. The ocean dataset has 0 = ocean, 1 = other, while the all water
+    # dataset has 1 = other, 2 = water. These are TIFF datasets, which contain
+    # data in the "band_data" variable, and has a band dimension even if its
+    # length is 1.
+    ocean_data = ocean_water["band_data"][1, :, :].data
+    all_data = all_water["band1"][1, :, :].data
+    
+    water_data = zeros_like(ocean_data)
+    water_data[all_data == 1] = 1
+    water_data[numpy.logical_and(all_data == 2, ocean_data == 1)] = 2
+
+    # These are large datasets, so free the memory from concretising the data
+    del(ocean_data); del(all_data)
 
     # We should be able to do this somewhat cleverly, instead of relying on
     # some windowed most common algorithm. Given we know the only possible
@@ -78,7 +86,6 @@ def upscale_water_bodies(water_bodies):
     # 1. If value > 10, then the most common flag was a 5 (originally 2)
     # 2. If mod(value, 5) > 2, then the most common flag was a 1
     # 3. Otherwise, the most common flag was a 0.
-    water_data = water_bodies["water_classification"].data
     water_data[water_data == 2] = 5
 
     upscaled_data = water_data[0::2, 0::2] + water_data[1::2, 0::2] + \
@@ -195,6 +202,5 @@ def correct_metadata(dataset):
 if __name__ == "__main__":
     args = _parse_args()
 
-    # The sources contains [CCI_land_cover, CCI_water_bodies]
-    main(args.land_cover, args.water_bodies, args.output)
+    main(args.CCI_land_cover, args.CCI_water_dir, args.output)
 
