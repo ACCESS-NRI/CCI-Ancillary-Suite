@@ -60,13 +60,11 @@ def upscale_water_bodies(ocean_water, all_water):
 
     # First, combine the datasets to differentiate between ocean and inland
     # water. The ocean dataset has 0 = ocean, 1 = other, while the all water
-    # dataset has 1 = other, 2 = water. These are TIFF datasets, which contain
-    # data in the "band_data" variable, and has a band dimension even if its
-    # length is 1.
-    ocean_data = ocean_water["band_data"][1, :, :].data
-    all_data = all_water["band1"][1, :, :].data
+    # dataset has 1 = other, 2 = water.
+    ocean_data = ocean_water["band_data"][0, :, :].data
+    all_data = all_water["band_data"][0, :, :].data
     
-    water_data = zeros_like(ocean_data)
+    water_data = numpy.zeros_like(ocean_data)
     water_data[all_data == 1] = 1
     water_data[numpy.logical_and(all_data == 2, ocean_data == 1)] = 2
 
