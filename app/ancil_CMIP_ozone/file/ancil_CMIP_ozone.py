@@ -316,15 +316,23 @@ def read_cmip6_temperature(filename, tinputyr0):
 
 def zonal_mean_ozone(cube):
     cube_zonal = cube.collapsed('longitude', iris.analysis.MEAN)
-    cube_zonal_long1 = iris.util.as_compatible_shape(cube_zonal, cube)
-    xcoord_T = np.array([360.0])
-    long_T = iris.coords.DimCoord(xcoord_T,
-                      standard_name='longitude', circular = True,
-                      units='degrees', coord_system=iris.coord_systems.GeogCS(iris.fileformats.pp.EARTH_RADIUS))
-    cube_zonal_long1.remove_coord('longitude')
-    cube_zonal_long1.add_dim_coord(long_T, 3)
+    cube_zonal_lon = iris.util.new_axis(
+            cube_zonal,
+            scalar_coord=iris.coords.DimCoord(
+                [360.0],
+                standard_name='longitude',
+                circular=True,
+                units='degrees',
+                coord_system=iris.coord_system.GeogCS(
+                    iris.fileformats.pp.EARTH_RADIUS
+                    )
+                )
+            )
+    )
 
-    return cube_zonal_long1
+    cube_zonal_lon.transpose(cube_zonal.shape, (1,))
+
+    return cube_zonal_lon
 
 def interpolate_to_new_latitudes(from_cube, to_cube):
     interpolator = iris.analysis.Linear(extrapolation_mode='linear').interpolator(from_cube, ['latitude'])
