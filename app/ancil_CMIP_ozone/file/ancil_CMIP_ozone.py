@@ -44,17 +44,17 @@ def parse_args():
             )
     parser.add_argument(
             '--zonal',
-            action='store_true',
+            type=int,
             help='Whether to reduce the output to zonal values.'
             )
     parser.add_argument(
             '--climatological_temperature',
-            action='store_true',
+            type=int,
             help='Whether to treat temperature as climatological.'
             )
     parser.add_argument(
-            '--extrapolate',
-            action='store_true',
+            '--extend',
+            type=int,
             help='Whether to allow extrapolating outside the source data period.'
             )
     parser.add_argument(
@@ -75,7 +75,7 @@ def main(
         year_range,
         zonal,
         climatological_temperature,
-        extrapolate,
+        extend,
         netcdf_only
         ):
 
@@ -97,7 +97,7 @@ def main(
             year_range,
             zonal,
             climatological_temperature,
-            extrapolate
+            extend
             )
 
     iris.fileformats.netcdf.save(new_ozone, output_file + '.nc')
@@ -112,14 +112,14 @@ def generate_ozone(
         year_range,
         zonal=False,
         climatological_temperature=True,
-        extrapolate=False
+        extend=False
         ):
     """
     Process the ozone data to produce a new dataset defined on model levels.
     """
 
     # Check that the supplied arguments are valid
-    check_dates(ozone, year_range, extrapolate)
+    check_dates(ozone, year_range, extend)
 
     # Ensure that the temperature and ozone have compatible time domains
     check_temperature_ozone(temperature, ozone, climatological_temperature)
@@ -138,7 +138,10 @@ def generate_ozone(
 
     # Set up the real model level heights
     pressure_heights = derive_pressure_heights(temperature)
-    pressure_heights_on_grid = interpolate_to_new_latitudes(pressure_heights, orog_height)
+    pressure_heights_on_grid = interpolate_to_new_latitudes(
+            pressure_heights,
+            orog_height
+            )
     model_heights = calculate_model_heights(orog_height, vert_grid)
 
     # Now interpolate the ozone onto the model horizontal grid
@@ -150,23 +153,36 @@ def generate_ozone(
                 model_heights
                 )
 
+    # Perform zonal averaging if requested
+    if zonal:
+        ozone_on_grid = ozone_on_grid.collapsed(
+                'longitude',
+                iris.analysis.MEAN
+                )
+
+    if extend:
+        raise NotImplementedError("""Extending the ozone outside the range of
+            the supplied data is not yet supported.""")
+
     return ozone_on_grid
 
 
-def check_dates(cube, year_range, extrapolate=False):
+def check_dates(cube, year_range, extend=False):
     """
     Ensure that the data on the cube spans the given year range, assuming
-    extrapolate is False. If extrapolate is True, just throw a message saying
-    that the data is being extrapolated.
+    extend is False. If extend is True, just throw a message saying
+    that the data is being extendd.
     """
-    t_as_datetime = cube.coord('time').units.num2date(cube.coord('time').points)
+    t_as_datetime = cube.coord(
+            'time'
+            ).units.num2date(cube.coord('time').points)
     yr_min = t_as_datetime[0].year
     yr_max = t_as_datetime[-1].year
     if yr_min > year_range.start or yr_max < (year_range.stop - 1):
-        if not extrapolate:
+        if not extend:
             raise ValueError(f"""The cube's data spans from {yr_min} to 
             {yr_max}, but the range of years requested is {year_range.start} to
-            {year_range.stop - 1}. The --extrapolate option was not specified,
+            {year_range.stop - 1}. The --extend option was not specified,
             so this request is not achievable.""")
         else:
             print(f"""The cube's data spans from {yr_min} to 
@@ -182,7 +198,9 @@ def check_temperature_ozone(temperature, ozone, climatological_temperature):
     of the temperature time axis must be 12- if False, then the axes must be of
     the same length.
     """
-    t_as_datetime = temperature.coord('time').units.num2date(temperature.coord('time').points)
+    t_as_datetime = temperature.coord(
+            'time'
+            ).units.num2date(temperature.coord('time').points)
 
     if climatological_temperature:
         assert t_as_datetime[0].year == t_as_datetime[-1].year, \
@@ -215,24 +233,30 @@ def derive_pressure_heights(temperature):
     pressure_boundary = numpy.zeros(npres+1)
     pressure_boundary[0] = sea_level_pressure
     pressure_boundary[-1] = 1.0e-5
-    pressure_boundary[1:-1] = numpy.sqrt(pressure_levels[:-1] * pressure_levels[1:])
+    pressure_boundary[1:-1] = numpy.sqrt(pressure_levels[:-1] * \
+            pressure_levels[1:])
 
     log_pres_boundary = numpy.log(pressure_boundary)
     dlogpressure = numpy.log(pressure_boundary[:-1] / pressure_boundary[1:])
-    frac = (log_pres_boundary[:-1] - numpy.log(pressure_levels)) / (log_pres_boundary[:-1] - log_pres_boundary[1:])
+    frac = (log_pres_boundary[:-1] - numpy.log(pressure_levels)) / \
+            (log_pres_boundary[:-1] - log_pres_boundary[1:])
 
     edge_height = numpy.zeros((nt, npres+1, nlat))
     centre_height = temperature.copy()
 
     for i in range(npres):
-        edge_height[:, i+1, :] = edge_height[:, i, :] + dlogpressure[i] * integrant.data[:, i, :]
-        centre_height.data[:, i, :] = edge_height[:, i, :] + frac[i] * dlogpressure[i] * integrant.data[:, i, :]
+        edge_height[:, i+1, :] = edge_height[:, i, :] + dlogpressure[i] * \
+                integrant.data[:, i, :]
+        centre_height.data[:, i, :] = edge_height[:, i, :] + frac[i] * \
+                dlogpressure[i] * integrant.data[:, i, :]
 
     return centre_height
 
 
 def interpolate_to_new_latitudes(from_cube, to_cube):
-    itp = iris.analysis.Linear(extrapolation_mode='linear').interpolator(from_cube, ['latitude'])
+    itp = iris.analysis.Linear(
+            extrapolation_mode='linear'
+            ).interpolator(from_cube, ['latitude'])
     interpolated = itp([to_cube.coord('latitude').points])
 
     return interpolated
@@ -256,7 +280,10 @@ def calculate_model_heights(orog_height, vert_grid):
     height = numpy.zeros((nz, nlat, nlon))
     # Walk up to the first constant level
     for i in range(first_const_rho_level):
-        height[i, :, :] = eta_theta[i] * ztop + orog_height.data * numpy.square(1 - eta_theta[i] / eta_theta[first_const_rho_level])
+        height[i, :, :] = eta_theta[i] * ztop + orog_height.data * \
+                numpy.square(
+                        1 - eta_theta[i] / eta_theta[first_const_rho_level]
+                        )
 
     # Remaining levels
     for i in range(first_const_rho_level, nz):
@@ -274,7 +301,8 @@ def match_coord_system(source, target):
     for coord in source.dim_coords:
         if (co_name := coord.name()) in target_dims:
             if target.coord(co_name).coord_system is not None:
-                assert target.coord(co_name).coord_system == coord.coord_system, \
+                assert target.coord(co_name).coord_system == \
+                        coord.coord_system, \
                         """Target coord already has a coordinate system that 
                         doesn't match the source coordinate system."""
             else:
@@ -329,6 +357,14 @@ def vertical_interpolate(
     return new_cube
 
 
+def zonal_average(cube):
+    """
+    Perform a zonal averaging of the given ozone data. Zonal averaging performs
+    an averaging over longitudes, such that each latitude has a single value
+    for ozone.
+    """
+
+    
 if __name__ == '__main__':
     args = parse_args()
 
@@ -344,6 +380,6 @@ if __name__ == '__main__':
             year_range,
             args.zonal,
             args.climatological_temperature,
-            args.extrapolate,
+            args.extend,
             args.netcdf_only
             )
