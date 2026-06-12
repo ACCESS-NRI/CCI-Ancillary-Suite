@@ -21,8 +21,7 @@
 			(ancil_LAI & ancil_canopy_height) => merge_veg_func
 			ancil_split_grass_types => ancil_soil_hydrology
 			ancil_split_grass_types => ancil_topographic_index
-			ancil_lct => regrid_albedo
-			(ancil_split_grass_types & regrid_albedo) => ancil_soil_albedo
+			ancil_split_grass_types => ancil_soil_albedo
 			(ancil_soil_hydrology & ancil_soil_albedo) => merge_soils
 			(ancil_split_grass_types & merge_soils) => ancil_soil_dust
 			(ancil_lct & ancil_LAI) => ancil_soil_roughness
@@ -169,10 +168,6 @@
 		"""
 
 	[[ancil_topographic_index]]
-		inherit = PBS_medium_parallel
-		script = rose task-run
-
-	[[regrid_albedo]]
 		inherit = PBS_medium_parallel
 		script = rose task-run
 
