@@ -25,17 +25,19 @@
 			(ancil_soil_hydrology & ancil_soil_albedo) => merge_soils
 			(ancil_split_grass_types & merge_soils) => ancil_soil_dust
 			(ancil_lct & ancil_LAI) => ancil_soil_roughness
-			(ancil_orographic_formdrag_preproc & ancil_lct) => ancil_orographic_formdrag
-			(ancil_lct & ancil_orography_unfiltered_preproc) => ancil_orography_mean => ancil_orographic_wavedrag
-			(ancil_aeroclim_preproc & ancil_orographic_wavedrag) => regrid_aerosol
-			(ancil_orography_filtered_preproc & ancil_orography_mean) => ancil_orographic_wavedrag => regrid_ozone
-			ancil_lct => ancil_clim_dms
-			ancil_lct => ancil_clim_sea
-			(ancil_orography_unfiltered_preproc & ancil_lct) => ancil_radiation_parameters
-			ancil_lct => regrid_seaice_reynolds
-			ancil_lct => regrid_SST_reynolds
-			(ancil_river_routing_preproc & ancil_lct) => ancil_river_routing
-			ancil_river_routing => ancil_river_storage_preproc => ancil_river_storage
+            {% if ATMOSPHERE_ANCILLARIES %}
+                (ancil_orographic_formdrag_preproc & ancil_lct) => ancil_orographic_formdrag
+                (ancil_lct & ancil_orography_unfiltered_preproc) => ancil_orography_mean => ancil_orographic_wavedrag
+                (ancil_aeroclim_preproc & ancil_orographic_wavedrag) => regrid_aerosol
+                (ancil_orography_filtered_preproc & ancil_orography_mean) => ancil_orographic_wavedrag => regrid_ozone
+                ancil_lct => ancil_clim_dms
+                ancil_lct => ancil_clim_sea
+                (ancil_orography_unfiltered_preproc & ancil_lct) => ancil_radiation_parameters
+                ancil_lct => regrid_seaice_reynolds
+                ancil_lct => regrid_SST_reynolds
+                (ancil_river_routing_preproc & ancil_lct) => ancil_river_routing
+                ancil_river_routing => ancil_river_storage_preproc => ancil_river_storage
+        {% endif %}
 		"""
 			
 [runtime]
@@ -79,8 +81,6 @@
         [[preprocess_CCI_water]]
                 script = rose task-run
                 inherit = PBS_huge_serial
-                [[[environment]]]
-                        CCI_YEAR = {{ CCI_YEAR }}
  
 	[[ancil_lct]]
 		{% if GRID_SOURCE == "land_cover" %}
@@ -98,7 +98,7 @@
 		[[[environment]]]
 			{% if LAND_MODEL == "CABLE" %}
 				DEFAULT_TRANSFORM = "cci2cable.json"
-				{% if URBAN == "true" %}
+				{% if URBAN %}
 					DEFAULT_TRANSFORM = "cci2cable_urban.json"
 				{% endif %}
 			{% elif LAND_MODEL == "JULES" %}
