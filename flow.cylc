@@ -27,9 +27,10 @@
 			(ancil_split_grass_types & merge_soils) => ancil_soil_dust
 			(ancil_lct & ancil_LAI) => ancil_soil_roughness
 			(ancil_orographic_formdrag_preproc & ancil_lct) => ancil_orographic_formdrag
-			(ancil_lct & ancil_orography_unfiltered_preproc) => ancil_orography_mean => ancil_orographic_wavedrag
+            (ancil_orography_filtered_preproc & ancil_lct) => ancil_orographic_wavedrag
+			(ancil_orography_unfiltered_preproc & ancil_lct) => ancil_orography_mean => ancil_orographic_wavedrag
 			(ancil_aeroclim_preproc & ancil_orographic_wavedrag) => regrid_aerosol
-			(ancil_orography_filtered_preproc & ancil_orographic_wavedrag => ancil_CMIP_ozone
+			ancil_orographic_wavedrag => ancil_CMIP_ozone
 			ancil_lct => ancil_clim_dms
 			ancil_lct => ancil_clim_sea
 			(ancil_orography_unfiltered_preproc & ancil_lct) => ancil_radiation_parameters
