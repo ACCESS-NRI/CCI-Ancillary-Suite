@@ -47,6 +47,7 @@
 			module load conda/analysis3-25.08
 			module load nco
 		"""
+        execution retry delays = 3*PT2M
 		[[[environment]]]
 			ANCIL_TARGET_PATH="/scratch/{{ STORAGE_PROJECT }}/${USER}/cylc-run/${CYLC_SUITE_NAME}/share/data"
 			ANCIL_MASTER="/g/data/access/TIDS/UM/ancil"
@@ -56,6 +57,7 @@
             VERTICAL_DISCRETIZATION={{ VERTICAL_DISCRETIZATION }}
 			TARGET_LSM=${ANCIL_TARGET_PATH}/land_sea_mask/qrparm.mask
 			TARGET_OROGRAPHIC_LSM=${ANCIL_TARGET_PATH}/orography/qrparm.orog_wavedrag
+            CCI_YEAR={{ CCI_YEAR }}
 			{% if LAND_MODEL == "CABLE" %}
 				MODEL_ICE_TILE = 17
 				MODEL_SOIL_TILE = 14
@@ -217,7 +219,7 @@
 		init-script = """
 			module use /g/data/access/ngm/modules
 			module load ants/1.2.0
-                        module load nco
+            module load nco
 		"""
 		[[[environment]]]
 			CALENDAR = {{ CALENDAR }}
