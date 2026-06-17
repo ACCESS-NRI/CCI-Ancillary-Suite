@@ -86,27 +86,29 @@ def preprocess_grass_source(grasses, grass_mapping):
 
     # Prepare the condensed fractions- same land shape, with one page for each
     # entry in the mapping dict.
-    condensed_data = numpy.ndarray(
+    # The pages in the condensed data array represent the surface type. So in
+    # the CABLE example of shrubs, C3 grass, C4 grass and Tundra being included
+    # in the surfaces to be remapped, these pages specify how much of the total
+    # surface devoted to these fractions should be set to this specific type.
+    # Say there was a grid cell which CCI saif was 20% shrub, 40% C3 grass,
+    # 0% C4 grass and 10% tundra, meaning the grid cell total was 70%. The
+    # values in this condensed data says how much of that 70% should be
+    # redistributed to each of those types.
+    condensed_data = numpy.zeros(
         (len(grass_mapping), *grasses.data.shape[1:]),
         dtype=float
         )
 
     for target_ind, (_, source_inds) in enumerate(grass_mapping.items()):
-        condensed_data[target_ind, :, :] = numpy.sum(grasses.data[source_inds, :, :], axis=0)
+        condensed_data[target_ind, :, :] = numpy.sum(
+                grasses.data[source_inds, :, :], axis=0
+                )
 
     # Now normalise to that the fractions along the tile axis sum to 1.0
     net_fractions = numpy.sum(condensed_data, axis=0)
+    valid_mask = ~(net_fractions == 0.0)
 
-    condensed_data /= net_fractions
-
-    # This will result in a nan wherever the NCAR thought there was no grass.
-    # We don't want to apply this to the original fractions- the assumption we
-    # made was that CCI will determine how much grass there is, and NCAR splits
-    # it, so we should keep to that rule. So we will fill in the NaN entries
-    # that resulted from zero fractions using nearest neighbour.
-    mask = numpy.where(~numpy.isnan(condensed_data))
-    interp = scipy.interpolate.NearestNDInterpolator(mask, condensed_data[mask])
-    condensed_data = interp(*numpy.indices(condensed_data.shape))
+    condensed_data[:, valid_mask] /= net_fractions[valid_mask]
 
     return condensed_data
 
@@ -122,11 +124,19 @@ def apply_grass_fractions(orig_fractions, grass_fractions, grass_mapping):
     orig_grasses = numpy.sum(orig_fractions.data[orig_grass_ids, :, :], axis=0)
 
     for source_ind, target_ind in enumerate(orig_grass_ids):
-        orig_fractions.data[target_ind, :, :] = grass_fractions[source_ind, :, :] * orig_grasses
+        orig_fractions.data[target_ind, :, :] = \
+                grass_fractions[source_ind, :, :] * orig_grasses
 
     # We also need to think about what happens when the CCI fractions say there
     # is grass, but the NCAR fractions say there is none. At this stage, it
     # will end up removing all the grass without compensating the other types.
+    # For now, we just apply a simple normalisation, so this means there will
+    # be some grid cells that don't obey the original rule of "CCI says how
+    # much and NCAR says how it should be split", but the rule is not well
+    # posed on those grid cells anyway, as splitting a series of 0.0 is
+    # not meaningful.
+    total_frac = numpy.sum(orig_fractions.data, axis=0)
+    orig_fractions.data /= total_frac
     return orig_fractions
 
 def main(grass_source, original_fractions, mapping_file, output, netcdf_only):
@@ -134,11 +144,9 @@ def main(grass_source, original_fractions, mapping_file, output, netcdf_only):
     Reprocess the grass fractions in the original fractions.
     """
     grass_mapping = process_grass_mapping(mapping_file)
-    print(f'The generated grass mapping: {grass_mapping}')
     grass_source, orig_fractions = load_data(grass_source, original_fractions)
     
     grass_fractions = preprocess_grass_source(grass_source, grass_mapping)
-    print(f'The shape of the processed grass fractions: {grass_fractions.shape}')
     new_fractions = apply_grass_fractions(
         orig_fractions,
         grass_fractions,
