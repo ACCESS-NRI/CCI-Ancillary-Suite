@@ -1,0 +1,30 @@
+{
+  "@context": [
+    "https://doi.org/10.5063/schema/codemeta-2.0",
+    {
+      "hermes": "https://software-metadata.pub/ns/hermes/"
+    }
+  ],
+  "@type": "SoftwareSourceCode",
+  "author": [
+    {
+      "@id": "https://orcid.org/0000-0002-3084-4496",
+      "@type": "Person",
+      "affiliation": {
+        "@type": "Organization",
+        "legalName": "Australian National University"
+      },
+      "familyName": "Whyborn",
+      "givenName": "Lachlan Stuart",
+      "email": "lachlan.whyborn@anu.edu.au"
+    }
+  ],
+  "description": "A Cylc8 workflow utilising the Rose plugin for generating land and atmosphere ancillaries for generation 3 ACCESS models.",
+  "keywords": [
+    "land",
+    "atmosphere",
+    "ancillaries",
+    "land cover"
+  ],
+  "name": "CCI-Ancillary-Suite"
+}
