@@ -56,7 +56,7 @@ jobs:
 
       - run: |
           # Cache current branch for PR close job
-          git branch --show-current > .hermes/curate/target_branch
+          echo "$GITHUB_REF_NAME" > .hermes/curate/target_branch
 
           # Shorten the SHA for the PR title
           SHORT_SHA=$(echo "$GITHUB_SHA" | cut -c -8)
