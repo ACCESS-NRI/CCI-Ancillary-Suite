@@ -58,6 +58,8 @@
 			TARGET_LSM=${ANCIL_TARGET_PATH}/land_sea_mask/qrparm.mask
 			TARGET_OROGRAPHIC_LSM=${ANCIL_TARGET_PATH}/orography/qrparm.orog_wavedrag
             CCI_YEAR={{ CCI_YEAR }}
+			BEGIN_YEAR={{ BEGIN_YEAR }}
+			END_YEAR={{ END_YEAR }}
 			{% if LAND_MODEL == "CABLE" %}
 				MODEL_ICE_TILE = 17
 				MODEL_SOIL_TILE = 14
