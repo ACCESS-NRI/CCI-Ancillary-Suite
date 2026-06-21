@@ -52,6 +52,8 @@ import iris
 import numba
 import numpy as np
 
+iris.FUTURE.save_split_attrs = True
+
 # max-min particle dims for each division.
 MAX_DIM_PART = np.array([.2e-6, .632456e-6, 2e-6, 6.32456e-6, 2e-5,
                          6.32456e-5])

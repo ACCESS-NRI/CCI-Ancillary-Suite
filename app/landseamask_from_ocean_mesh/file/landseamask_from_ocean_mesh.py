@@ -5,6 +5,9 @@ import esmpy
 import numpy
 import argparse
 import ants
+import iris
+
+iris.FUTURE.save_split_attrs = True
 
 def parse_args():
     parser = argparse.ArgumentParser()

@@ -24,6 +24,7 @@ import ants.io.save as save
 import iris
 import numpy as np
 
+iris.FUTURE.save_split_attrs = True
 
 def load_data(formdrag_filepath, target_filepath):
     half_height = ants.io.load.load_cube(formdrag_filepath, "m01s00i018")

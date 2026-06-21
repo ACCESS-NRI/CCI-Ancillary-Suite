@@ -2,6 +2,9 @@ import ants
 import json
 import numpy
 import scipy
+import iris
+
+iris.FUTURE.save_split_attrs = True
 
 # This script uses an external dataset to split a generic grass type from a
 # source land fractions using an external dataset. The process is split into 3

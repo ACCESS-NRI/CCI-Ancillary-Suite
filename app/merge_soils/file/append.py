@@ -11,7 +11,9 @@ import warnings
 
 import ants
 import ants.io.save as save
+import iris
 
+iris.FUTURE.save_split_attrs = True
 
 def main(filenames, output):
     cubes = ants.io.load.load(filenames)
