@@ -37,14 +37,14 @@ def convert_to_ice(veg_frac, ice_tile_id):
 
     # We want to create a mask which sets only the ice tile below -60 latitude to
     # 1.0, and every other land point below -60 latitude to 0.0.
-    land_mask = numpy.sum(veg_frac.data, axis=0) > 0.0
+    land_mask = ~veg_frac.data.mask
     lat_mask = veg_frac.coord('latitude').points > -60
-    land_mask[lat_mask, :] = False
+    land_mask[:, lat_mask, :] = False
     
-    ice_tile_mask = veg_frac.coord('pseudo_level').points.data == 17
+    ice_tile_mask = veg_frac.coord('pseudo_level').points.data == ice_tile_id
 
-    ice_mask = ice_tile_mask[:, None, None] & land_mask[None, :, :]
-    nonice_mask = ~ice_tile_mask[:, None, None] & land_mask[None, :, :]
+    ice_mask = ice_tile_mask[:, None, None] & land_mask
+    nonice_mask = ~ice_tile_mask[:, None, None] & land_mask
 
     veg_frac.data[ice_mask] = 1.0
     veg_frac.data[nonice_mask] = 0.0
