@@ -21,6 +21,7 @@ import ants.decomposition as decomp
 import ants.io.save as save
 import ants.utils
 
+iris.FUTURE.save_split_attrs = True
 
 def load_data(albedo_filepath, lct_filepath):
     albedo_cube = ants.io.load.load_cube(albedo_filepath)

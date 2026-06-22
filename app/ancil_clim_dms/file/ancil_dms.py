@@ -13,7 +13,9 @@ import ants
 import ants.decomposition as decomp
 import ants.io.save as save
 import numpy as np
+import iris
 
+iris.FUTURE.save_split_attrs = True
 
 def load(sources, target_lsm):
     lsm_cube = ants.io.load.load_cube(target_lsm, "land_binary_mask")

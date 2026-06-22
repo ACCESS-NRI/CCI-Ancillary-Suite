@@ -14,6 +14,7 @@ import ants.io.save as save
 import iris
 from ants.analysis.filters import raymond
 
+iris.FUTURE.save_split_attrs = True
 
 def load_data(source):
     return ants.io.load.load_cube(source)

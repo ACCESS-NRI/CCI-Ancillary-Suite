@@ -30,6 +30,7 @@ import ants.decomposition as decomp
 import ants.io.save as save
 import canopy_heights
 
+iris.FUTURE.save_split_attrs = True
 
 def load_data(source_path, trees_filepath, canopy_height_factors_path):
     lai_stash_con = iris.AttributeConstraint(STASH='m01s00i217')

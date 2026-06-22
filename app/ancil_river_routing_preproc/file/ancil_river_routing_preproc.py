@@ -25,6 +25,8 @@ import ants.utils
 import iris
 import iris.fileformats.pp as ipp
 
+iris.FUTURE.save_split_attrs = True
+
 RIVER_SEQUENCE = {"stash": ipp.STASH(1, 0, 151), "long_name": "river_routing_sequence"}
 
 

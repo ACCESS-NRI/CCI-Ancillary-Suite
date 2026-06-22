@@ -35,6 +35,7 @@ import ants.utils
 from ants.utils.cube import create_time_constrained_cubes
 import iris
 
+iris.FUTURE.save_split_attrs = True
 
 def load_data(
     source,

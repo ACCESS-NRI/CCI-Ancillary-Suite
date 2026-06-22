@@ -25,6 +25,7 @@ import ants.io.save as save
 import ants.utils
 import iris.fileformats.pp as ipp
 
+iris.FUTURE.save_split_attrs = True
 STORAGE = {
     "stash_in": ipp.STASH(0, 26, 1),
     "stash_out": ipp.STASH(1, 0, 153),

@@ -57,6 +57,7 @@ import iris
 import numpy as np
 from proc_ants import order_nemo_rivers
 
+iris.FUTURE.save_split_attrs = True
 POUR_POINT_INDICATOR = 9
 
 
