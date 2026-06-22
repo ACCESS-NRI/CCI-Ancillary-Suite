@@ -282,17 +282,16 @@ class DomParameters(_SoilRegridScheme):
                 MAPPING_EXTENDED[name]['STASH'])
             cubes_dict[name] = cube
 
-        for i in range(dom_soil_id.shape[0]):
-            for j in range(dom_soil_id.shape[1]):
-                soil_id = dom_soil_id.data[i, j]
-                if soil_id in [0, np.ma.masked]:
-                    continue
-                params = soilid_parameter_lookup[str(soil_id)]
-                for key, value in params.items():
-                    try:
-                        cubes_dict[key].data[i, j] = value
-                    except KeyError:
-                        pass
+        # Instead of iterating through each cell, determine the unique soil IDs
+        # and assign them using array indexing (excluding soil ID 0)
+        unique_soil_ids = numpy.unique(dom_soil_id.data.compressed())
+        unique_soil_ids = unique_soil_ids[unique_soil_ids != 0]
+        for soil_id in unique_soil_ids:
+            param = soilid_parameter_lookup[str(soil_id)]
+            id_mask = dom_soil_id.data == soil_id
+            for key, value in params.items():
+                cube_dict[key].data[mask] = value
+
         if np.ma.isMaskedArray(dom_soil_id.data):
             for cube in cubes:
                 cube.data.mask = dom_soil_id.data.mask.copy()
@@ -326,44 +325,77 @@ class DomParameters(_SoilRegridScheme):
         """
         units_flattened = units.reshape(-1)
         muglobal_soilid_lookup = lookup["muglobal_soilid_lookup"]
-        output = np.ma.zeros(shape, dtype="int")
-        output.mask = True
-        output_flattened = output.reshape(-1)
 
-        curr_row = -1
-        contributing = {}
-        for row, column, weight in zip(rows, columns, weights):
-            # Reset the maximum weight found for this target cell and move on
-            # to recording the maximum weight for the next target cell.
-            if row != curr_row:
-                if contributing:
-                    output_flattened[curr_row] = list(contributing.keys())[
-                        np.array(list(contributing.values())).argmax()
-                    ]
-                    contributing.clear()
-                curr_row = row
+        int_lookup = {
+                int(mu): [(int(sid), share)
+                          for sid, share in soils.items if int(sid) != 1]
+                for mu, soils in muglobal_soilid_lookup_items()
+                }
 
-            # Fetch the MU_GLOBAL for this source cell.
-            mu_global = units_flattened[column]
-            if not mu_global > 0:
-                # skip ocean
+        # fetch values using vector indexing
+        mu_globals = units_flattened[columns].astype(int)
+        valid = mu_globals > 0
+        rows_v = rows[valid]
+        mu_v = mu_globals[valid]
+        weights_v = mu_globals[valid]
+
+        # sort so that each group is contiguous
+        sort_idx = numpy.argsort(mu_v, kind='stable')
+        mu_sorted = mu_v[sort_idx]
+        rows_sorted = rows_v[sort_idx]
+        weights_sorted = weights_v[sort_idx]
+
+        # Set up the groups- the boundaries specify where in the vectors the
+        # given mu ends
+        mu_unique, boundaries = numpy.unique(mu_sorted, return_index=True)
+        boundaries = numpy.append(boundaries, len(mu_sorted))
+
+        # Now apply the operation for each unique mu
+        exp_rows = []
+        exp_soil_ids = []
+        exp_weights = []
+        for i, mu in enumerate(mu_unique):
+            soils = int_lookup[int(mu)]
+            if not soils:
                 continue
-            # Fetch all soil IDs corresponding to this MU_GLOBAL
-            munits = muglobal_soilid_lookup[str(mu_global)]
-            for unit in munits:
-                if int(unit) == 1:
-                    # skip non-soil
-                    continue
-                # Determine contribution of this soil ID (weight * share).
-                if unit not in contributing:
-                    contributing[unit] = 0
-                contributing[unit] += weight * munits[unit]
+            begin, end = boundaries[i], boundaries[i+1]
+            row = rows_sorted[begin:end]
+            weights = weights_sorted[begin:end]
+            for soil_id, share in soils:
+                exp_rows.append(row)
+                exp_soil_ids.append(np.full(len(row), soil_id))
+                exp_weights.append(weights * share)
 
-        if contributing:
-            output_flattened[curr_row] = list(contributing.keys())[
-                np.array(list(contributing.values())).argmax()
-            ]
-        return output
+        if not exp_rows:
+            output = numpy.ma.zeros(shape, dtype='int')
+            output.mask = True
+            return output
+
+        all_rows = numpy.concatenate(exp_rows)
+        all_soil_ids = numpy.concatenate(exp_soil_ids)
+        all_weights = numpy.concatenate(exp_weights)
+
+        # Map soil IDs to column inds in sparse matrix
+        soil_ids_unique, soil_column = numpy.unique(
+                all_soil_ids,
+                return_inverse=True
+                )
+        n_target = int(numpy.prod(shape))
+
+        contrib = scipy.sparse.csr_matrix(
+                (all_weights, (all_rows, soil_col)),
+                shape=(n_target, len(unique_soil_ids))
+                )
+
+        dominant_col = numpy.asarray(contrib.argmax(axis=1)).ravel()
+        has_contrib = numpy.diff(contrib.indptr) > 0
+
+        output = numpy.where(has_contrib, unique_soil_ids[dominant_col], 0)
+        return numpy.ma.array(
+                output.reshape(shape),
+                mask=~has_contrib.reshape(shape)
+                )
+
 
     @classmethod
     def _ret_parameters(cls, lookup, units_cube, target_grid):
