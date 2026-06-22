@@ -37,6 +37,7 @@ import ants.io.save as save
 import iris
 import numpy as np
 
+iris.FUTURE.save_split_attrs = True
 
 def mean_stdev(source, target):
     mean_cube = ants.analysis.mean(source, target)

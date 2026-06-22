@@ -37,6 +37,7 @@ import ants
 import ants.io.save as save
 import iris
 
+iris.FUTURE.save_split_attrs = True
 
 def load_data(source):
     with warnings.catch_warnings():

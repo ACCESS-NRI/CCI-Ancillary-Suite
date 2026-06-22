@@ -34,6 +34,7 @@ import numpy as np
 import orography_utils
 from ants.analysis.filters import raymond
 
+iris.FUTURE.save_split_attrs = True
 _LOGGER = logging.getLogger(__name__)
 
 

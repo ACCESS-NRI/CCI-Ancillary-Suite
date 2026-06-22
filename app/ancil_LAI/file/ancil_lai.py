@@ -85,6 +85,7 @@ import numpy as np
 
 import lai
 
+iris.FUTURE.save_split_attrs = True
 
 def load_data(sources, relative_weights_path):
     lai_source = ants.io.load.load_cube(sources, 'leaf_area_index')
