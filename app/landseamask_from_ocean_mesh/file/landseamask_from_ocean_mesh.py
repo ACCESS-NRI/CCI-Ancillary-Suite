@@ -270,6 +270,7 @@ def save_landfracs(nlat, nlon, land_frac, out_fp):
     # ocean points and cause bad ocean ancillaries
     sea_mask = da < 1.0
     sea_mask.name = 'sea_binary_mask'
+    sea_mask.attrs['STASH'] = 'm01s00i030'
     sea_mask.attrs['grid_staggering'] = 6
     sea_mask.attrs['valid_min'] = 0
     sea_mask.attrs['valid_max'] = 1

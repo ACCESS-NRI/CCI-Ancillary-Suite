@@ -23,6 +23,7 @@ import ants.config
 import ants.fileformats.pp as pp
 import ants.io.save as save
 import ants.utils
+import iris
 import iris.fileformats.pp as ipp
 
 iris.FUTURE.save_split_attrs = True

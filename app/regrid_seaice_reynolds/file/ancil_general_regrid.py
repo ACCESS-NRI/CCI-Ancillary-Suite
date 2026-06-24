@@ -32,6 +32,7 @@ import ants
 import ants.decomposition as decomp
 import ants.io.save as save
 import ants.utils
+import iris
 from ants.utils.cube import create_time_constrained_cubes
 
 iris.FUTURE.save_split_attrs = True
