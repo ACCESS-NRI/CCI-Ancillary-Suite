@@ -8,6 +8,7 @@
 [scheduling]
 	[[graph]]
 		R1 = """
+            capture_provenance
 			{% if GRID_SOURCE == "ocean_mesh" %}
 				landseamask_from_ocean_mesh => ancil_lct
 			{% endif %}
@@ -270,3 +271,9 @@
 	[[ancil_river_storage]]
 		inherit = PBS_small_serial
 		script = rose task-run
+
+    [[capture_provenance]]
+        script = """
+                mkdir ${ANCIL_TARGET_PATH}/provenance
+                cp ${CYLC_WORKFLOW_LOG_DIR}/* ${ANCIL_TARGET_PATH/provenance
+                """
