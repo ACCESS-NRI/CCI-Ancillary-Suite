@@ -272,8 +272,9 @@
 		inherit = PBS_small_serial
 		script = rose task-run
 
-    [[capture_provenance]]
-        script = """
-                mkdir ${ANCIL_TARGET_PATH}/provenance
-                cp ${CYLC_WORKFLOW_LOG_DIR}/* ${ANCIL_TARGET_PATH/provenance
-                """
+        [[capture_provenance]]
+                platform = localhost
+                script = """
+                        mkdir ${ANCIL_TARGET_PATH}/provenance -p
+                        cp ${CYLC_SUITE_RUN_DIR}/log/version/* ${CYLC_SUITE_RUN_DIR}/rose-suite.conf ${ANCIL_TARGET_PATH}/provenance
+                        """
