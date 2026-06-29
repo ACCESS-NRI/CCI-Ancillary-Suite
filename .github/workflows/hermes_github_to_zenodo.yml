@@ -108,10 +108,16 @@ jobs:
       # 3. Check if you want to run with '--initial', as this may potentially create a completely new record (collection),
       #    rather than a new version of the same collection!
       - run: hermes deposit --initial -O invenio_rdm.auth_token ${{ secrets.ZENODO_SANDBOX }} --file artifact.zip --file README.md
+        id: deposit
 
       # ADAPT
       # Remove this command if you don't want to do any postprocessing
       - run: hermes postprocess
+        id: postproc
+
+      # Add a step to make the hermes.log available if the publish fails
+      - run: cat hermes.log
+        if: failure() && (steps.deposit.outcome == 'failure' || steps.postproc.outcome == 'failure')
 
       # ADAPT
       # If you don't want to run postprocessing, remove this complete section (next '-run' and 'uses: peter-evans/...' bullets).
