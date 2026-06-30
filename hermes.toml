@@ -7,3 +7,4 @@ target = "invenio_rdm"
 [deposit.invenio_rdm]
 site_url = "https://sandbox.zenodo.org"
 access_right = "restricted"
+access_conditions = "This repository is restricted under the \"THE MET OFFICE SOFTWARE LICENCE FOR NON-COMMERCIAL USE\". Contact the repository owner with proof of UKMO MOSRS account to be granted access to this repository."
