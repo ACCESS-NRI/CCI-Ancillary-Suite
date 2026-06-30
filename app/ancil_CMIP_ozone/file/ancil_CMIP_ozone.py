@@ -34,28 +34,30 @@ def parse_args():
             '--output',
             required=True,
             type=str,
-            help='Path to write the output to.',
+            help='Path to write the output to.'
             )
     parser.add_argument(
-            '--year-range',
-            required=True,
-            type=str,
-            help='Start and end years for desired output as <start_year>,<end_year>'
+            '--begin',
+            required=False,
+            type=int,
+            help='Begin year for the output.'
+            )
+    parser.add_argument(
+            '--end',
+            required=False,
+            type=int,
+            help='End year for the output.'
             )
     parser.add_argument(
             '--zonal',
             type=int,
+            action=store_true,
             help='Whether to reduce the output to zonal values.'
             )
     parser.add_argument(
-            '--climatological_temperature',
-            type=int,
-            help='Whether to treat temperature as climatological.'
-            )
-    parser.add_argument(
-            '--extend',
-            type=int,
-            help='Whether to allow extrapolating outside the source data period.'
+            '--climatological',
+            action=store_true,
+            help='Whether to produce climatological output.'
             )
     parser.add_argument(
             '--netcdf-only',
@@ -72,19 +74,21 @@ def main(
         orography_file,
         vert_file,
         output_file,
-        year_range,
+        begin_year,
+        end_year,
         zonal,
-        climatological_temperature,
-        extend,
+        climatological,
         netcdf_only
         ):
 
     ozone = iris.load(ozone_path)
     iris.util.equalise_attributes(ozone)
     ozone = ozone.concatenate_cube()
+
     temperature = iris.load(temperature_path)
     iris.util.equalise_attributes(temperature)
     temperature = temperature.concatenate_cube()
+
     orog_height = iris.load_cube(orography_file, 'surface_altitude')
     vert_nml = ants.fileformats.namelist._read_namelist(vert_file)
     vert_grid = ants.fileformats.namelist.VerticalLevels(vert_nml)
@@ -94,35 +98,33 @@ def main(
             temperature,
             orog_height,
             vert_grid,
-            year_range,
+            begin,
+            end,
             zonal,
-            climatological_temperature,
-            extend
+            climatological,
             )
 
-    iris.fileformats.netcdf.save(new_ozone, output_file + '.nc')
+    ants.io.save.netcdf(new_ozone, output_file)
     if not netcdf_only:
-        iris.fileformats.pp.save(new_ozone, output_file)
+        ants.io.save.ancil(new_ozone, output_file)
 
 def generate_ozone(
         ozone,
         temperature,
         orog_height,
         vert_grid,
-        year_range,
+        begin_year,
+        end_year,
         zonal=False,
-        climatological_temperature=True,
-        extend=False
+        climatological=False,
         ):
     """
     Process the ozone data to produce a new dataset defined on model levels.
     """
 
     # Check that the supplied arguments are valid
-    check_dates(ozone, year_range, extend)
-
-    # Ensure that the temperature and ozone have compatible time domains
-    check_temperature_ozone(temperature, ozone, climatological_temperature)
+    check_dates(ozone, begin_year, end_year)
+    check_dates(temperature, begin_year, end_year)
 
     # Extract the desired years for ozone and optionally temperature
     yr_constraint = iris.Constraint(
@@ -133,8 +135,7 @@ def generate_ozone(
                     )
 
     ozone = ozone.extract(yr_constraint)
-    if not climatological_temperature:
-        temperature = temperature.extract(yr_constraint)
+    temperature = temperature.extract(yr_constraint)
 
     # Set up the real model level heights
     pressure_heights = derive_pressure_heights(temperature)
@@ -160,6 +161,8 @@ def generate_ozone(
                 iris.analysis.MEAN
                 )
 
+    if climatological:
+        ozone_on_grid = 
     if extend:
         raise NotImplementedError("""Extending the ozone outside the range of
             the supplied data is not yet supported.""")
@@ -167,7 +170,7 @@ def generate_ozone(
     return ozone_on_grid
 
 
-def check_dates(cube, year_range, extend=False):
+def check_dates(cube, begin_year, end_year, extend=False):
     """
     Ensure that the data on the cube spans the given year range, assuming
     extend is False. If extend is True, just throw a message saying
@@ -178,38 +181,10 @@ def check_dates(cube, year_range, extend=False):
             ).units.num2date(cube.coord('time').points)
     yr_min = t_as_datetime[0].year
     yr_max = t_as_datetime[-1].year
-    if yr_min > year_range.start or yr_max < (year_range.stop - 1):
-        if not extend:
-            raise ValueError(f"""The cube's data spans from {yr_min} to 
-            {yr_max}, but the range of years requested is {year_range.start} to
-            {year_range.stop - 1}. The --extend option was not specified,
-            so this request is not achievable.""")
-        else:
-            print(f"""The cube's data spans from {yr_min} to 
-            {yr_max}, but the range of years requested is {year_range.start} to
-            {year_range.stop - 1}. Extrapolating to fill out the requested
-            period.""")
-
-
-def check_temperature_ozone(temperature, ozone, climatological_temperature):
-    """
-    Ensure that the temperature and ozone have compatible sizes. If
-    climatological_temperature is True, then this only means that the length
-    of the temperature time axis must be 12- if False, then the axes must be of
-    the same length.
-    """
-    t_as_datetime = temperature.coord(
-            'time'
-            ).units.num2date(temperature.coord('time').points)
-
-    if climatological_temperature:
-        assert t_as_datetime[0].year == t_as_datetime[-1].year, \
-                """Temperature is specified as climatogical, but spans more
-                than a year."""
-    else:
-        assert len(t_as_datetime) == (len(ozone.coord('time').points)), \
-                """Temperature is not specified as climatogical, but has a
-                different time axis length to the ozone."""
+    if yr_min > begin_year or yr_max < end_year:
+        raise ValueError(f"""The cube's data spans from {yr_min} to 
+        {yr_max}, but the range of years requested is {begin_year} to
+        {end_year}.""")
 
 
 def derive_pressure_heights(temperature):
