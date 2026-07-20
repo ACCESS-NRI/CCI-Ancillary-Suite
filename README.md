@@ -8,6 +8,15 @@ A [Cylc8](https://cylc.github.io/cylc-doc/stable/html/index.html) workflow, util
 
 Configure the workflow by modifying the `rose-suite.conf` file. The top level configuration options are described in the [Configuration][#top-level-configuration] section below. The workflow by default runs and uses storage under the user's default project `$PROJECT`. The working directory is `/scratch/<project>/<user>/cylc-run/CCI-Ancillary-Suite/<runID>/, with the output data located in that directory under `share/data`.
 
+## Requirements
+
+To run the suite on Gadi, membership is required to the following projects:
+
+* hr22
+* vk83
+* access
+* cm45
+
 ## Top Level Configuration
 
 The top level configuration options, located in `rose-suite.conf`, are:
