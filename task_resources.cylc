@@ -1,3 +1,15 @@
+# We need to override the default, the user may not always want to write to their default scratch space
+[install]
+  [[symlink dirs]]
+    [[[gadi,pbs]]]
+      log = /scratch/{{ STORAGE_PROJECT }}/{{ environ['USER'] }}
+      share = /scratch/{{ STORAGE_PROJECT }}/{{ environ['USER'] }}
+      work = /scratch/{{ STORAGE_PROJECT }}/{{ environ['USER'] }}
+    [[[localhost]]]
+      log = /scratch/{{ STORAGE_PROJECT }}/{{ environ['USER'] }}
+      share = /scratch/{{ STORAGE_PROJECT }}/{{ environ['USER'] }}
+      work = /scratch/{{ STORAGE_PROJECT }}/{{ environ['USER'] }}
+
 [runtime]
 	[[PBS_small_serial]]
     platform = pbs
