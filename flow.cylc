@@ -49,7 +49,7 @@
 		"""
         execution retry delays = 3*PT2M
 		[[[environment]]]
-			ANCIL_TARGET_PATH="/scratch/{{ STORAGE_PROJECT }}/${USER}/cylc-run/${CYLC_SUITE_NAME}/share/data"
+			ANCIL_TARGET_PATH="/scratch/${PROJECT}/${USER}/cylc-run/${CYLC_SUITE_NAME}/share/data"
 			ANCIL_MASTER="/g/data/access/TIDS/UM/ancil"
 			ANCIL_PREPROC_PATH="/g/data/access/TIDS/RMED/ANTS/preproc"
 			CALENDAR={{ CALENDAR }}
