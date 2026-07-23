@@ -12,11 +12,10 @@ def _parse_args():
     parser = argparse.ArgumentParser()
 
     parser.add_argument(
-            '--soil-depths',
+            '--soil-thickness',
             required=True,
             type=str,
-            help="""Comma separated list of soil depths, representing the
-                centre point of the soil level."""
+            help='Comma separated list of soil layer thicknesses.'
             )
 
     parser.add_argument(
@@ -53,7 +52,21 @@ def _parse_args():
     return parser.parse_args()
 
 
-def generate_soil_moisture(vol_smc_at_saturation, soil_depths, moisture_units):
+def depths_from_thickness(soil_thickness):
+    """
+    Generate the soil layer depths from the given soil layer thickness.
+    """
+    return [0.5 * soil_thickness[l] if l == 0 else
+              numpy.sum(soil_thickness[:l]) + 0.5 * soil_thickness[l]
+              for l in range(len(soil_thickness))
+              ]
+
+
+def generate_soil_moisture(
+        vol_smc_at_saturation,
+        soil_thickness,
+        moisture_units
+        ):
     """
     Create a new soil moisture cube from the volumetric soil moisture
     content at saturation, given soil depths and desired moisture units. The
@@ -65,22 +78,15 @@ def generate_soil_moisture(vol_smc_at_saturation, soil_depths, moisture_units):
     # Broadcast the single dimensional soil properties over layers
     smc_at_sat = numpy.repeat(
             vol_smc_at_saturation.data[:, :, numpy.newaxis],
-            len(soil_depths),
-            axis=0)
+            len(soil_thickness),
+            axis=2
+            )
 
     if moisture_units == 'mass':
         # We want soil moisture in kg m-2, so scale by 
         # density * soil layer depth.
-        layer_thicknesses = numpy.array([
-                soil_depths[1] - soil_depths[0] if d == 0 else
-                soil_depths[-1] - soil_depths[-2] if d == len(soil_depths) else
-                (soil_depths[d + 1] - soil_depths[d])
-                for d in range(len(soil_depths))
-                ])
-
         water_density = 1000.0
-
-        smc_at_sat = smc_at_sat * layer_thicknesses * water_density
+        smc_at_sat = smc_at_sat * soil_thickness * water_density
 
         standard_name = 'mass_content_of_water_in_soil_layer'
         units = 'kg m-2'
@@ -93,21 +99,23 @@ def generate_soil_moisture(vol_smc_at_saturation, soil_depths, moisture_units):
         raise ValueError("""The supplied moisture units must be either
         'mass' or 'volumetric'.""")
 
+    depths = depths_from_thickness(soil_thickness)
+
     # Create the soil depth dimension
-    depths = iris.DimCoord(
-            soil_depths,
+    depth_coord = iris.coords.DimCoord(
+            depths,
             standard_name='depth',
             units='m'
             )
 
-    smc_cube = iris.Cube(
+    smc_cube = iris.cube.Cube(
             smc_at_sat,
-            standard_name=standard_name,
+            var_name=standard_name,
             units=units,
             dim_coords_and_dims=[
-                (vol_smc_at_saturation.dim('latitude'), 0),
-                (vol_smc_at_saturation.dim('longitude'), 1),
-                (depths, 2)
+                (vol_smc_at_saturation.coord('latitude'), 0),
+                (vol_smc_at_saturation.coord('longitude'), 1),
+                (depth_coord, 2)
                 ]
             )
 
@@ -120,80 +128,87 @@ def generate_soil_temperature(vol_smc_at_saturation, soil_depths, max_temp):
     equator to 0.0 at the poles."""
 
     # Reuse the vol_smc_at_saturation so that we have the mask
-    soil_temperature = numpy.ones_like(vol_smc_at_saturation)
+    soil_temperature = numpy.ones_like(vol_smc_at_saturation.data)
 
     # Set up the latitude scaling
-    latitude_scaling = (numpy.abs(
-            vol_smc_at_saturation.dim('latitude').points
-    ) - 90) / 90
+    latitude_scaling = (90 - numpy.abs(
+            vol_smc_at_saturation.coord('latitude').points
+    )) / 90
 
     # Apply the scaling and the max temperature
-    soil_temperature = soil_temperature * latitude_scaling * max_temp
+    soil_temperature = soil_temperature * \
+            numpy.reshape(latitude_scaling, (-1, 1)) * max_temp
 
     # Spread over the soil layers
     soil_temperature = numpy.repeat(
-            soil_temperature[numpy.new_axis, :, :],
-            len(soil_depths),
-            axis=0
+            soil_temperature[:, :, numpy.newaxis],
+            len(soil_thickness),
+            axis=2
             )
 
+    depths = depths_from_thickness(soil_thickness)
+
     # Create the soil depth dimension
-    depths = iris.DimCoord(
-            soil_depths,
+    depth_coord = iris.coords.DimCoord(
+            depths,
             standard_name='depth',
             units='m'
             )
 
-    soil_temp_cube = iris.Cube(
+    soil_temp_cube = iris.cube.Cube(
         soil_temperature,
-        standard_name='soil_temperature',
+        var_name='soil_temperature',
         units='K',
         dim_coords_and_dims=[
-            (vol_smc_at_saturation.dim('latitude'), 0),
-            (vol_smc_at_saturation.dim('longitude'), 1),
-            (depths, 2)
+            (vol_smc_at_saturation.coord('latitude'), 0),
+            (vol_smc_at_saturation.coord('longitude'), 1),
+            (depth_coord, 2)
             ]
         )
 
     return soil_temp_cube
 
 
-def main(soil_properties_path, soil_depths, moisture_units, max_temp, output):
+def main(soil_parameters_path,
+         soil_thickness,
+         moisture_units,
+         max_temp,
+         output
+         ):
     # Load in the smc wilting to determine the mask and create smc
     smc_at_wilting = iris.load_cube(
-            soil_properties_path,
+            soil_parameters_path,
             'volumetric_soil_moisture_content_at_saturation'
             )
 
     soil_smc = generate_soil_moisture(
             smc_at_wilting,
-            soil_depths,
+            soil_thickness,
             moisture_units
             )
 
     soil_temp = generate_soil_temperature(
             smc_at_wilting,
-            soil_depths,
+            soil_thickness,
             max_temp
             )
 
-    cubelist = iris.CubeList([soil_smc, soil_temp])
+    cubelist = iris.cube.CubeList([soil_smc, soil_temp])
 
-    iris.fileformats.netcdf.save(output)
+    iris.fileformats.netcdf.save(cubelist, output)
 
 
 if __name__ == '__main__':
 
     args = _parse_args()
 
-    soil_depths = numpy.array([float(d) for d in args.soil_depths.split(',')])
-    assert numpy.all(soil_depths[:-1] < soil_depths[1:]), \
-            'Soil depths must be monotonically increasing.'
+    soil_thickness = numpy.array([float(d) 
+                                  for d in args.soil_thickness.split(',')])
 
     main(
-            args.soil_properties,
-            soil_depths,
+            args.soil_parameters,
+            soil_thickness,
             args.moisture_units,
-            args.max_temp,
+            args.max_temperature,
             args.output
             )
