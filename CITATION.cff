@@ -1,0 +1,21 @@
+cff-version: 1.2.0
+title: CCI-Ancillary-Suite
+message: >-
+  If you use this software, please cite it using the
+  metadata from this file.
+type: software
+authors:
+  - given-names: Lachlan Stuart
+    family-names: Whyborn
+    email: lachlan.whyborn@anu.edu.au
+    affiliation: Australian National University
+    orcid: 'https://orcid.org/0000-0002-3084-4496'
+abstract: >-
+  A Cylc8 workflow utilising the Rose plugin for generating
+  land and atmosphere ancillaries for generation 3 ACCESS
+  models.
+keywords:
+  - land
+  - atmosphere
+  - ancillaries
+  - land cover
