@@ -15,6 +15,7 @@
 			ancil_lct => regrid_ncar_lulcc
 			ancil_lct => ancil_fix_antarctic_permanent_ice
 			(ancil_fix_antarctic_permanent_ice & regrid_ncar_lulcc) => ancil_split_grass_types
+            ancil_split_grass_types => apply_min_tile_fraction
 			ancil_lct => regrid_LAI
 			(ancil_split_grass_types & regrid_LAI) => ancil_LAI
 			ancil_LAI => ancil_canopy_height
@@ -135,6 +136,10 @@
 			{% elif LAND_MODEL == "JULES" %}
 				DEFAULT_MAPPING = "ncar_grass_jules.json"
 			{% endif %}
+
+    [[apply_min_tile_fraction]]
+        inherit = PBS_medium_serial
+        script = rose task-run
 
 	[[regrid_LAI]]
 		inherit = PBS_medium_parallel
