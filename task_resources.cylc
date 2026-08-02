@@ -8,7 +8,7 @@
 			-l mem=10GB
 			-l walltime=2:00:00
 			-l jobfs=10GB
-			-l storage=gdata/hr22+gdata/xp65+gdata/vk83+gdata/access+gdata/{{ COMPUTE_PROJECT}}+scratch/{{ COMPUTE_PROJECT }}+scratch/${PROJECT}
+			-l storage=gdata/hr22+gdata/xp65+gdata/vk83+gdata/access+gdata/{{ COMPUTE_PROJECT }}+scratch/{{ COMPUTE_PROJECT }}+scratch/{{ environ['PROJECT'] }}
 
   [[PBS_medium_serial]]
     platform = pbs
@@ -19,7 +19,7 @@
 			-l mem=50GB
 			-l walltime=2:00:00
 			-l jobfs=50GB
-			-l storage=gdata/hr22+gdata/xp65+gdata/vk83+gdata/access+gdata/{{ COMPUTE_PROJECT}}+scratch/{{ COMPUTE_PROJECT }}+scratch/${PROJECT}    
+			-l storage=gdata/hr22+gdata/xp65+gdata/vk83+gdata/access+gdata/{{ COMPUTE_PROJECT }}+scratch/{{ COMPUTE_PROJECT }}+scratch/{{ environ['PROJECT'] }}
 	[[PBS_large_serial]]
     platform = pbs
 		[[[directives]]]
@@ -29,7 +29,7 @@
 			-l mem=100GB
 			-l walltime=2:00:00
 			-l jobfs=100GB
-			-l storage=gdata/hr22+gdata/xp65+gdata/vk83+gdata/access+gdata/{{ COMPUTE_PROJECT}}+scratch/{{ COMPUTE_PROJECT }}+scratch/${PROJECT}
+			-l storage=gdata/hr22+gdata/xp65+gdata/vk83+gdata/access+gdata/{{ COMPUTE_PROJECT }}+scratch/{{ COMPUTE_PROJECT }}+scratch/{{ environ['PROJECT'] }}
 
 	[[PBS_small_parallel]]
     platform = pbs
@@ -40,7 +40,7 @@
 			-l mem=50GB
 			-l walltime=2:00:00
 			-l jobfs=50GB
-			-l storage=gdata/hr22+gdata/xp65+gdata/vk83+gdata/access+gdata/{{ COMPUTE_PROJECT}}+scratch/{{ COMPUTE_PROJECT }}+scratch/${PROJECT}
+			-l storage=gdata/hr22+gdata/xp65+gdata/vk83+gdata/access+gdata/{{ COMPUTE_PROJECT }}+scratch/{{ COMPUTE_PROJECT }}+scratch/{{ environ['PROJECT'] }}
 	[[PBS_medium_parallel]]
     platform = pbs
 		[[[directives]]]
@@ -50,7 +50,7 @@
 			-l mem=50GB
 			-l walltime=4:00:00
 			-l jobfs=50GB
-			-l storage=gdata/hr22+gdata/xp65+gdata/vk83+gdata/access+gdata/{{ COMPUTE_PROJECT}}+scratch/{{ COMPUTE_PROJECT }}+scratch/${PROJECT}
+			-l storage=gdata/hr22+gdata/xp65+gdata/vk83+gdata/access+gdata/{{ COMPUTE_PROJECT }}+scratch/{{ COMPUTE_PROJECT }}+scratch/{{ environ['PROJECT'] }}
   
 	[[PBS_long_parallel]]
     platform = pbs
@@ -61,7 +61,7 @@
 			-l mem=50GB
 			-l walltime=10:00:00
 			-l jobfs=50GB
-			-l storage=gdata/hr22+gdata/xp65+gdata/vk83+gdata/access+gdata/{{ COMPUTE_PROJECT}}+scratch/{{ COMPUTE_PROJECT }}+scratch/${PROJECT}
+			-l storage=gdata/hr22+gdata/xp65+gdata/vk83+gdata/access+gdata/{{ COMPUTE_PROJECT }}+scratch/{{ COMPUTE_PROJECT }}+scratch/{{ environ['PROJECT'] }}
   
 	[[PBS_large_parallel]]
     platform = pbs
@@ -72,7 +72,7 @@
 			-l mem=190GB
 			-l walltime=8:00:00
 			-l jobfs=150GB
-			-l storage=gdata/hr22+gdata/xp65+gdata/vk83+gdata/access+gdata/{{ COMPUTE_PROJECT}}+scratch/{{ COMPUTE_PROJECT }}+scratch/${PROJECT}
+			-l storage=gdata/hr22+gdata/xp65+gdata/vk83+gdata/access+gdata/{{ COMPUTE_PROJECT }}+scratch/{{ COMPUTE_PROJECT }}+scratch/{{ environ['PROJECT'] }}
   
 	[[PBS_huge_serial]]
 		platform = pbs
@@ -83,7 +83,7 @@
 			-l mem=900GB
 			-l walltime=4:00:00
 			-l jobfs=200GB
-			-l storage=gdata/hr22+gdata/xp65+gdata/vk83+gdata/access+gdata/cm45+gdata/{{ COMPUTE_PROJECT}}+scratch/{{ COMPUTE_PROJECT }}+scratch/${PROJECT}
+			-l storage=gdata/hr22+gdata/xp65+gdata/vk83+gdata/access+gdata/cm45+gdata/{{ COMPUTE_PROJECT }}+scratch/{{ COMPUTE_PROJECT }}+scratch/{{ environ['PROJECT'] }}
 
 	[[PBS_huge_parallel]]
 		platform = pbs
@@ -94,4 +94,4 @@
 			-l mem=1000GB
 			-l walltime=4:00:00
 			-l jobfs=100GB
-			-l storage=gdata/hr22+gdata/xp65+gdata/vk83+gdata/access+gdata/{{ COMPUTE_PROJECT}}+scratch/{{ COMPUTE_PROJECT }}+scratch/${PROJECT}
+			-l storage=gdata/hr22+gdata/xp65+gdata/vk83+gdata/access+gdata/{{ COMPUTE_PROJECT }}+scratch/{{ COMPUTE_PROJECT }}+scratch/${{ environ['PROJECT'] }}
