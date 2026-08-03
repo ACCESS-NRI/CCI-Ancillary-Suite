@@ -25,6 +25,13 @@
 			(ancil_soil_hydrology & ancil_soil_albedo) => merge_soils
 			(ancil_split_grass_types & merge_soils) => ancil_soil_dust
 			(ancil_lct & ancil_LAI) => ancil_soil_roughness
+            {% if SOIL_INITIAL_CONDITIONS %}
+                {% if SOIL_INIT_CONDS_METHOD == "functional" %}
+                    ancil_soil_hydrology => functional_soil_initial_conditions
+                {% else %}
+				    {{ raise("Invalid SOIL_INIT_CONDS_METHOD: " ~ LAND_MODEL) }}
+                {% endif %}
+            {% endif %}
             {% if ATMOSPHERE_ANCILLARIES %}
                 (ancil_orographic_formdrag_preproc & ancil_lct) => ancil_orographic_formdrag
                 (ancil_lct & ancil_orography_unfiltered_preproc) => ancil_orography_mean => ancil_orographic_wavedrag
@@ -67,12 +74,16 @@
 				MODEL_C3_GRASS_TILE = 6
 				MODEL_C4_GRASS_TILE = 7
 				MODEL_TREE_TILES = "1,2,3,4"
+                SOIL_THICKNESS = "0.022,0.058,0.154,0.409,1.085,2.872"
+                MOISTURE_UNITS = "volumetric"
 			{% elif LAND_MODEL == "JULES" %}
 				MODEL_ICE_TILE = 9
 				MODEL_SOIL_TILE = 8
 				MODEL_C3_GRASS_TILE = 3
 				MODEL_C4_GRASS_TILE = 4
 				MODEL_TREE_TILES = "1,2"
+                SOIL_THICKNESS = "0.1,0.25,0.65,2.0"
+                MOISTURE_UNITS = "mass"
 			{% else %}
 				{{ raise("Invalid LAND_MODEL: " ~ LAND_MODEL) }}
 			{% endif %}	
@@ -171,6 +182,10 @@
 			module use /g/data/access/ngm/modules
 			module load ants/1.1.0
 		"""
+
+    [[functional_soil_initial_conditions]]
+        inherit = PBS_medium_parallel
+        script = rose task-run
 
 	[[ancil_topographic_index]]
 		inherit = PBS_medium_parallel

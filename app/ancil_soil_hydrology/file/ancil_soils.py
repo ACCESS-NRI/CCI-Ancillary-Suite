@@ -90,22 +90,20 @@ MAPPING = {
     "sm_sat": {
         "units": "m3 m-3",
         "STASH": "m01s00i043",
-        "standard_name": "soil_porosity",
+        "standard_name": "volume_fraction_of_water_in_soil_at_saturation",
         "long_name": "volumetric soil moisture content at saturation",
     },
     "sm_wilt": {
         "units": "m3 m-3",
         "STASH": "m01s00i040",
-        "standard_name": (
-            "volume_fraction_of_condensed_water_in_soil_" "at_wilting_point"
-        ),
-        "long_name": ("volumetric soil moisture content at the " "wilting point"),
+        "standard_name": "volume_fraction_of_condensed_water_in_soil_at_wilting_point",
+        "long_name": "volumetric soil moisture content at the wilting point",
     },
     "sm_crit": {
         "units": "m3 m-3",
         "STASH": "m01s00i041",
         "standard_name": (
-            "volume_fraction_of_condensed_water_in_soil_" "at_critical_point"
+            "volume_fraction_of_condensed_water_in_soil_at_critical_point"
         ),
         "long_name": (
             "volumetric soil moisture content at the "
@@ -116,6 +114,7 @@ MAPPING = {
     "BD": {
         "units": "kg m-3",
         "STASH": "m01s00i008",
+        "standard_name": "soil_density",
         "long_name": ("bulk density of the soil"),
     },
     "soil_carb": {
