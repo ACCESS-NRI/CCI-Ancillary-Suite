@@ -80,7 +80,7 @@ def update_glomap_meta(cube, gregorian=False):
     cube.coord("time").bounds = time_units.date2num(date_bounds)
     cube.coord("time").points = np.mean(cube.coord("time").bounds, axis=1)
     # This setting is not used in GLOMAP MODE climatologies at present
-    cube.coord("time").attributes["calendar_flexible"] = "1"
+    cube.coord("time").attributes["calendar_flexible"] = 1
 
 
 def time_mean(cube, gregorian=False):
