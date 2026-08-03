@@ -8,12 +8,20 @@ A [Cylc8](https://cylc.github.io/cylc-doc/stable/html/index.html) workflow, util
 
 Configure the workflow by modifying the `rose-suite.conf` file. The top level configuration options are described in the [Configuration][#top-level-configuration] section below. The workflow by default runs and uses storage under the user's default project `$PROJECT`. The working directory is `/scratch/<project>/<user>/cylc-run/CCI-Ancillary-Suite/<runID>/, with the output data located in that directory under `share/data`.
 
+## Requirements
+
+To run the suite on Gadi, membership is required to the following projects:
+
+* hr22
+* vk83
+* access
+* cm45
+
 ## Top Level Configuration
 
 The top level configuration options, located in `rose-suite.conf`, are:
 
 * `COMPUTE_PROJECT`: Which project to request compute resources from. Defaults to `${PROJECT}`.
-* `STORAGE_PROJECT`: Which project to use for storage. Becomes the `<project>` in the above working directory path. Defaults to `${PROJECT}`.
 * `LAND_MODEL`: Which land model to target. Affects the generation of vegetation ancillaries, which depend tiles active in the model. Possible options are `CABLE` and `JULES`. Defaults to `CABLE`.
 * `GRID_SOURCE`: How the land/sea mask should be defined for the workflow. There are 3 possible options:
     * `ocean_mesh`: Generate a land/sea mask from a provided ocean mesh, then project the land cover onto it. If this is supplied, the `RESOLUTION` option must also be defined.

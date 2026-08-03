@@ -46,6 +46,7 @@ import ants.io.save as save
 import iris
 import numpy as np
 
+iris.FUTURE.save_split_attrs = True
 
 def main(source_path, lai_path, target_lsm, outfile, netcdf_only):
     "main top/level"

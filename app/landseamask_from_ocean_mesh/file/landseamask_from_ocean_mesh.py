@@ -5,6 +5,9 @@ import esmpy
 import numpy
 import argparse
 import ants
+import iris
+
+iris.FUTURE.save_split_attrs = True
 
 def parse_args():
     parser = argparse.ArgumentParser()
@@ -251,10 +254,10 @@ def save_landfracs(nlat, nlon, land_frac, out_fp):
     # Also create the mask
     mask = da > 0.0
     mask.name = 'land_binary_mask'
-    mask.attrs["STASH"] = 'm01s00i030'
-    mask.attrs["grid_staggering"] = 6
-    mask.attrs["valid_min"] = 0
-    mask.attrs["valid_max"] = 1
+    mask.attrs['STASH'] = 'm01s00i030'
+    mask.attrs['grid_staggering'] = 6
+    mask.attrs['valid_min'] = 0
+    mask.attrs['valid_max'] = 1
 
     mask_as_cube = mask.to_iris()
     for dim in mask_as_cube.coords():
@@ -262,6 +265,23 @@ def save_landfracs(nlat, nlon, land_frac, out_fp):
 
     ants.io.save.netcdf(mask_as_cube, out_fp + '/qrparm.mask')
     ants.io.save.ancil(mask_as_cube, out_fp + '/qrparm.mask')
+
+    # Need the ocean mask as well, since the land mask will mask out fractional
+    # ocean points and cause bad ocean ancillaries
+    sea_mask = da < 1.0
+    sea_mask.name = 'sea_binary_mask'
+    sea_mask.attrs['STASH'] = 'm01s00i030'
+    sea_mask.attrs['grid_staggering'] = 6
+    sea_mask.attrs['valid_min'] = 0
+    sea_mask.attrs['valid_max'] = 1
+
+    sea_mask_as_cube = sea_mask.to_iris()
+    for dim in sea_mask_as_cube.coords():
+        dim.bounds = None
+
+    ants.io.save.netcdf(sea_mask_as_cube, out_fp + '/qrparm.mask_sea')
+    ants.io.save.ancil(sea_mask_as_cube, out_fp + '/qrparm.mask_sea')
+
 
 if __name__ == '__main__':
     args = parse_args()

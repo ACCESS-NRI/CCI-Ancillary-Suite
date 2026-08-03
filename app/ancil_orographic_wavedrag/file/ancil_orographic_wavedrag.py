@@ -58,6 +58,7 @@ import iris.analysis.calculus
 import numpy as np
 import orography_utils
 
+iris.FUTURE.save_split_attrs = True
 _LOGGER = logging.getLogger(__name__)
 
 

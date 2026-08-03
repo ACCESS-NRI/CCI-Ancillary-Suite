@@ -24,6 +24,7 @@ import ants.utils
 import iris
 import numpy as np
 
+iris.FUTURE.save_split_attrs = True
 
 def load_data(source_path):
     direction_constraint = iris.AttributeConstraint(STASH="m01s00i152")

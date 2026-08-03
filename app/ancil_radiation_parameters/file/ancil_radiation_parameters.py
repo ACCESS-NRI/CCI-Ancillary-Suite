@@ -36,6 +36,7 @@ import iris.analysis.calculus
 import numpy as np
 import orography_utils
 
+iris.FUTURE.save_split_attrs = True
 
 def calc_slopes(source, ocean_mask):
     """
