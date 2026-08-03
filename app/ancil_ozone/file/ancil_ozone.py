@@ -50,14 +50,19 @@ def parse_args():
             )
     parser.add_argument(
             '--zonal',
-            type=int,
-            action=store_true,
+            action='store_true',
             help='Whether to reduce the output to zonal values.'
             )
     parser.add_argument(
             '--climatological',
-            action=store_true,
+            action='store_true',
             help='Whether to produce climatological output.'
+            )
+    parser.add_argument(
+            '--extend',
+            action='store_true',
+            help="""Whether to allow constant extrapolation outside
+            source data bounds."""
             )
     parser.add_argument(
             '--netcdf-only',
@@ -78,6 +83,7 @@ def main(
         end_year,
         zonal,
         climatological,
+        extend,
         netcdf_only
         ):
 
@@ -98,10 +104,11 @@ def main(
             temperature,
             orog_height,
             vert_grid,
-            begin,
-            end,
+            begin_year,
+            end_year,
             zonal,
             climatological,
+            extend
             )
 
     ants.io.save.netcdf(new_ozone, output_file)
@@ -117,6 +124,7 @@ def generate_ozone(
         end_year,
         zonal=False,
         climatological=False,
+        extend=False
         ):
     """
     Process the ozone data to produce a new dataset defined on model levels.
@@ -125,14 +133,6 @@ def generate_ozone(
     # Check that the supplied arguments are valid
     check_dates(ozone, begin_year, end_year)
     check_dates(temperature, begin_year, end_year)
-
-    # Extract the desired years for ozone and optionally temperature
-    yr_constraint = iris.Constraint(
-                    time=lambda t: \
-                    iris.time.PartialDateTime(year_range.start) <= \
-                    t.point < \
-                    iris.time.PartialDateTime(year_range.stop - 1)
-                    )
 
     ozone = ozone.extract(yr_constraint)
     temperature = temperature.extract(yr_constraint)
@@ -161,8 +161,20 @@ def generate_ozone(
                 iris.analysis.MEAN
                 )
 
+    # Perform climatological reduction. Note that this specifically averages
+    # over the year range requested. If climatological is desired over the full
+    # epoch of the original dataset, remove the --begin and --end arguments.
     if climatological:
-        ozone_on_grid = 
+        ozone_on_grid = iris.coord_categorisation.add_month_number(
+                ozone_on_grid, 'time', name='month'
+                )
+
+        ozone_on_grid = ozone_on_grid.aggregation_by(
+                'month',
+                iris.analysis.MEAN,
+                climatological=True
+                )
+
     if extend:
         raise NotImplementedError("""Extending the ozone outside the range of
             the supplied data is not yet supported.""")
@@ -332,19 +344,8 @@ def vertical_interpolate(
     return new_cube
 
 
-def zonal_average(cube):
-    """
-    Perform a zonal averaging of the given ozone data. Zonal averaging performs
-    an averaging over longitudes, such that each latitude has a single value
-    for ozone.
-    """
-
-    
 if __name__ == '__main__':
     args = parse_args()
-
-    year_start, year_end = [int(inp) for inp in args.year_range.split(',')]
-    year_range = range(year_start, year_end+1)
 
     main(
             args.ozone_path,
@@ -352,9 +353,10 @@ if __name__ == '__main__':
             args.orography_file,
             args.vertical_disc,
             args.output,
-            year_range,
+            args.begin,
+            args.end,
             args.zonal,
-            args.climatological_temperature,
+            args.climatological,
             args.extend,
             args.netcdf_only
             )
