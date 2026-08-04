@@ -131,9 +131,9 @@
 		script = rose task-run
 		[[[environment]]]
 			{% if LAND_MODEL == "CABLE" %}
-				DEFAULT_MAPPING = "ncar_grass_cable.json"
+				GRASS_MAPPING = "ncar_grass_cable.json"
 			{% elif LAND_MODEL == "JULES" %}
-				DEFAULT_MAPPING = "ncar_grass_jules.json"
+				GRASS_MAPPING = "ncar_grass_jules.json"
 			{% endif %}
 
 	[[regrid_LAI]]
