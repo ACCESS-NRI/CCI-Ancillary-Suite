@@ -4,6 +4,12 @@ import iris
 import numpy
 import scipy
 
+R_gas = 287.058
+grav = 9.80665
+sea_level_pressure = 1013.25
+mass_ozone = 48.0
+mass_air = 28.97
+
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -134,6 +140,14 @@ def generate_ozone(
     check_dates(ozone, begin_year, end_year)
     check_dates(temperature, begin_year, end_year)
 
+    # Extract the desired years for ozone and optionally temperature
+    yr_constraint = iris.Constraint(
+                    time=lambda t: \
+                    iris.time.PartialDateTime(begin_year) <= \
+                    t.point <= \
+                    iris.time.PartialDateTime(end_year)
+                    )
+
     ozone = ozone.extract(yr_constraint)
     temperature = temperature.extract(yr_constraint)
 
@@ -153,6 +167,9 @@ def generate_ozone(
                 pressure_heights_on_grid,
                 model_heights
                 )
+
+    # Convert from molar fraction to mass fraction
+    ozone_on_grid = ozone_on_grid * (mass_ozone / mass_air)
 
     # Perform zonal averaging if requested
     if zonal:
@@ -205,10 +222,6 @@ def derive_pressure_heights(temperature):
     pressure levels, to turn them into heights.
     """
     
-    R_gas = 287.058
-    grav = 9.80665
-    sea_level_pressure = 1013.25
-
     pressure_levels = temperature.coord('pressure').points
     
     npres = len(pressure_levels)
