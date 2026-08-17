@@ -5,10 +5,11 @@ import numpy
 import scipy
 
 R_gas = 287.058
-grav = 9.80665
-sea_level_pressure = 1013.25
+grav = 9.81
+sea_level_pressure = 1013.0
 mass_ozone = 48.0
 mass_air = 28.97
+ppmv2mmr = 1.65
 
 def parse_args():
     parser = argparse.ArgumentParser()
