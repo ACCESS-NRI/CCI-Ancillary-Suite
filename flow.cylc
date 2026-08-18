@@ -62,7 +62,11 @@
 			CALENDAR={{ CALENDAR }}
 			RESOLUTION={{ RESOLUTION }}
             VERTICAL_DISCRETIZATION={{ VERTICAL_DISCRETIZATION }}
-			TARGET_LSM=${ANCIL_TARGET_PATH}/land_sea_mask/qrparm.mask
+            {% if GRID_SOURCE == "land_sea_mask" %}
+                TARGET_LSM={{ GRID_FILE }}
+            {% else %}
+			    TARGET_LSM=${ANCIL_TARGET_PATH}/land_sea_mask/qrparm.mask
+            {% endif %}
             TARGET_OCEAN=${ANCIL_TARGET_PATH}/land_sea_mask/qrparm.mask_sea
 			TARGET_OROGRAPHIC_LSM=${ANCIL_TARGET_PATH}/orography/qrparm.orog_wavedrag
             CCI_YEAR={{ CCI_YEAR }}
