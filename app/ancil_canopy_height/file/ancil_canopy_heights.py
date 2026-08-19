@@ -68,7 +68,7 @@ def duplicate_canopy_heights_over_12_months(canopy_heights_cube, lai):
 
 
 def main(source_filepath, trees_filepath, canopy_height_factors,
-         tree_ids, output_filepath, netcdf_only):
+         tree_ids, max_search_dist, output_filepath, netcdf_only):
     lai, trees_cube, canopy_height_factors = load_data(
         source_filepath, trees_filepath, canopy_height_factors)
     canopy_heights_cube = canopy_heights.calc_canopy_heights(
@@ -78,7 +78,7 @@ def main(source_filepath, trees_filepath, canopy_height_factors,
     trees = decomp.decompose(ants.analysis.mean, trees_cube,
                              canopy_heights_cube[0])
     canopy_heights_cube = canopy_heights.calc_tree_pfts(
-        trees, canopy_heights_cube, tree_ids)
+        trees, canopy_heights_cube, tree_ids, max_search_dist)
 
     canopy_heights_cube = duplicate_canopy_heights_over_12_months(
         canopy_heights_cube, lai)
@@ -97,7 +97,14 @@ if __name__ == '__main__':
                         help='Canopy height factors.',
                         required=True)
     parser.add_argument('--tree-ids', type=str, default='1,101,102,103,2,201,202')
+    parser.add_argument(
+            '--max-search-dist',
+            type=int,
+            default=500,
+            help='Maximum search distance for valid canopy height data in km.'
+            )
+
     args = parser.parse_args()
     tree_ids = [int(tree_id) for tree_id in args.tree_ids.split(',')]
     main(args.sources, args.trees_dataset, args.canopy_height_factors,
-         tree_ids, args.output, args.netcdf_only)
+         tree_ids, args.max_search_dist, args.output, args.netcdf_only)

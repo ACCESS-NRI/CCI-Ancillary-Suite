@@ -10,7 +10,10 @@ import ants.utils
 import index_nearest_neighbour
 
 
-def calc_tree_pfts(trees, canopy_heights, tree_ids = [1, 101, 102, 103, 2, 201, 202]):
+def calc_tree_pfts(trees,
+                   canopy_heights,
+                   tree_ids = [1, 101, 102, 103, 2, 201, 202],
+                   max_search_dist = 500):
     """
     Inject tree PFTs from the trees dataset.
 
@@ -34,7 +37,7 @@ def calc_tree_pfts(trees, canopy_heights, tree_ids = [1, 101, 102, 103, 2, 201, 
     ants.utils.cube.fix_mask(canopy_heights)
     target_mask = canopy_heights[0].data.mask
 
-    loop_lim_y = index_nearest_neighbour.ydist2index(trees, 500)
+    loop_lim_y = index_nearest_neighbour.ydist2index(trees, max_search_dist)
     if np.ma.is_masked(trees.data):
         index_nearest_neighbour.fill_nearest_index(
             trees.data,
