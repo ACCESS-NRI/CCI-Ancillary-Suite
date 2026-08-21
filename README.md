@@ -6,7 +6,7 @@ A [Cylc8](https://cylc.github.io/cylc-doc/stable/html/index.html) workflow, util
 
 ## Usage
 
-Configure the workflow by modifying the `rose-suite.conf` file. The top level configuration options are described in the [Configuration][#top-level-configuration] section below. The workflow by default runs and uses storage under the user's default project `$PROJECT`. The working directory is `/scratch/<project>/<user>/cylc-run/CCI-Ancillary-Suite/<runID>/, with the output data located in that directory under `share/data`.
+Configure the workflow by modifying the `rose-suite.conf` file. The top level configuration options are described in the [Configuration][#top-level-configuration] section below. The workflow by default runs and uses storage under the user's default project `$PROJECT`. The working directory is `/scratch/<project>/<user>/cylc-run/CCI-Ancillary-Suite/<runID>/`, with the output data located in that directory under `share/data`.
 
 ## Requirements
 
@@ -23,19 +23,25 @@ The top level configuration options, located in `rose-suite.conf`, are:
 
 * `COMPUTE_PROJECT`: Which project to request compute resources from. Defaults to `${PROJECT}`.
 * `LAND_MODEL`: Which land model to target. Affects the generation of vegetation ancillaries, which depend tiles active in the model. Possible options are `CABLE` and `JULES`. Defaults to `CABLE`.
+* `ATMOSPHERE_ANCILLARIES`: Whether to include generation of atmosphere ancillaries for the UM. Defaults to `true`.
+* `SOIL_INITIAL_CONDITIONS`: Whether soil initial conditions are generated, typically for land models. Defaults to `true`.
 * `GRID_SOURCE`: How the land/sea mask should be defined for the workflow. There are 3 possible options:
     * `ocean_mesh`: Generate a land/sea mask from a provided ocean mesh, then project the land cover onto it. If this is supplied, the `RESOLUTION` option must also be defined.
     * `land_cover`: Use the provided land cover dataset to determine the land/sea mask.
     * `land_sea_mask`: Use a supplied land.sea mask and project the land cover onto it.
-    Defaults to `ocean_mesh`.
+Defaults to `ocean_mesh`.
 * `GRID_FILE`: The file defining the grid to use. The form of this file depends on the `GRID_SOURCE`. When the `GRID_SOURCE` is:
     * `ocean_mesh`, the `GRID_FILE` should be a CM3 ocean mesh file.
     * `land_cover`, the `GRID_FILE` should be a UM grid namelist file.
     * `land_sea_mask`, the `GRID_FILE` should be a land sea mask in UM ancillary format.
-    Defaults to `"/scratch/rp23/lw5085/access-om3-025deg-ESMFmesh.nc"`.
+Defaults to `"/scratch/rp23/lw5085/access-om3-025deg-ESMFmesh.nc"`.
 * `VERTICAL_DISCRETIZATION`: Vertical discretization definition in UM namelist format. Defaults to an 85 level discretization at `"/g/data/access/TIDS/UM/ancil/data/namelist/vertical/vert_85/latest/vert_85"`.
 * `CALENDAR`: Which calendar to use for the time-dependent ancillaries. Possible options are `360day` and `gregorian`. Defaults to `360day`.
 * `RESOLUTION`: Used only when `GRID_SOURCE="ocean_mesh"`. Must be a valid UM resolution specifier e.g. `n96e`, `n512e`.
+* `URBAN`: Whether to include urban fractions in the surface type mapping.
+* `CCI_YEAR`: Which year to use from the CCI land cover dataset. Defaults to `2015`.
+* `BEGIN_YEAR`: Starting year for time series ancillaries. Defaults to `1982`.
+* `END_YEAR`: End year for the time series ancillaries. Defaults to `1990`.
 
 ## Common App Configurations
 
