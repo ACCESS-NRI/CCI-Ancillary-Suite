@@ -11,9 +11,32 @@ Derive the land cover type fraction, land cover fraction and optionally the
 landsea mask ancillaries by utilising the provided landcover types source with
 its corresponding transform (crosswalk table), mapping the source classes to
 the output JULES target classes.
-If providing a pre-existing landsea mask, the land cover type fraction will be
-made consistent with it, otherwise, the land cover type fraction field itself
-will be used to derive and output a landsea mask.
+
+There are now THREE ways to control the landsea mask used by this script:
+
+1. ``--target-grid``: mask/grid derived purely from the land-cover source
+   itself (original behaviour).
+2. ``--target-lsm``: an existing landsea mask netCDF is supplied and the
+   output is made consistent with it (original behaviour).
+3. ``--landfrac``: a land fraction netCDF is supplied. Both the land mask
+   and sea mask are derived directly from it (via ``--land-threshold``),
+   in memory, and used exactly as ``--target-lsm`` would be for the rest
+   of the workflow -- grid extraction, and forcing the output vegetation
+   fractions to be consistent with the derived mask. If
+   ``--landseamask-output-root`` is also given, the derived mask/mask_sea
+   and the landfrac itself are written out immediately, since they are
+   the user-supplied values of record rather than something to be
+   re-derived from the crosswalk output.
+
+``--landfrac`` and ``--target-lsm`` are mutually exclusive with each
+other (two different ways of specifying the same underlying mask), but
+``--landfrac`` IS compatible with ``--landseamask-output-root`` (unlike
+``--target-lsm``, which remains mutually exclusive with it as before).
+
+If providing a pre-existing landsea mask (via ``--target-lsm`` or
+``--landfrac``), the land cover type fraction will be made consistent
+with it, otherwise, the land cover type fraction field itself will be
+used to derive and output a landsea mask.
 
 Here are the steps taken:
 
@@ -32,8 +55,9 @@ Here are the steps taken:
     - Replace ice with soils for those locations not amongst these contiguous
       regions of ice found.
 - Ensure land fractions add up to 1 and ocean fraction add up to 1 by:
-    - If an optionally supplied landsea mask (``--target-lsm``) is provided, ensure
-      fields are consistent with the supplied mask.
+    - If an optionally supplied landsea mask (``--target-lsm`` or
+      ``--landfrac``) is provided, ensure fields are consistent with the
+      supplied mask.
     - If the mask is to be derived by the land cover type fraction field
       (``--landseamask-out``), a threshold of >= 50% ocean is to mean ocean and
       differences are redistributed amongst non-zero land type fraction fields.
@@ -122,6 +146,78 @@ def _prepare_mask_cube(cube):
     cube.data = cube.data.astype("int8")
 
 
+def generate_masks_from_landfrac(landfrac_path, land_threshold, output_root=None):
+    """
+    Derive a land mask and sea mask directly from a supplied land
+    fraction netCDF, independently thresholding each from landfrac:
+
+        mask      = landfrac > land_threshold       ("counts as land")
+        mask_sea  = landfrac < 1 - land_threshold    ("counts as ocean")
+
+    At land_threshold ~= 0 this gives "any land/ocean present" semantics
+    -- mask and mask_sea are BOTH true at genuinely mixed coastal cells
+    (correct where the ocean grid is finer than the atmosphere grid: a
+    mixed cell needs both land and ocean/sea-ice surface exchange to
+    run). At land_threshold = 0.5 this instead gives majority-rule
+    semantics, with mask/mask_sea near-complements.
+
+    landfrac itself is treated as the source of truth and is not
+    modified -- only mask/mask_sea are derived from it.
+
+    Parameters
+    ----------
+    landfrac_path : str
+        Path to the land fraction netCDF (land_area_fraction).
+    land_threshold : float
+        Threshold described above.
+    output_root : str, optional
+        If given, mask/mask_sea/landfrac are saved immediately in the
+        same qrparm.* pattern used elsewhere in this workflow, since
+        these are the user-supplied values of record rather than
+        something to be re-derived later from the crosswalk output.
+
+    Returns
+    -------
+    mask_cube : iris.cube.Cube
+        Land mask, STASH m01s00i030. Intended to be used as
+        `landseamask_in` for the rest of the LCT workflow.
+    ocean_mask_cube : iris.cube.Cube
+        Sea mask, STASH m01s00i030.
+    landfrac_cube : iris.cube.Cube
+        Land fraction, STASH m01s00i505, renamed/attributed but
+        otherwise unmodified from the input.
+    """
+    landfrac_cube = ants.load_cube(landfrac_path)
+    landfrac_data = np.asarray(landfrac_cube.data)
+
+    mask_cube = landfrac_cube.copy((landfrac_data > land_threshold).astype("int8"))
+    _prepare_mask_cube(mask_cube)
+
+    ocean_mask_cube = landfrac_cube.copy(
+        (landfrac_data < 1 - land_threshold).astype("int8")
+    )
+    _prepare_mask_cube(ocean_mask_cube)
+
+    landfrac_cube = landfrac_cube.copy(landfrac_data)
+    landfrac_cube.attributes["STASH"] = iris.fileformats.pp.STASH.from_msi(
+        "m01s00i505"
+    )
+    landfrac_cube.rename("land_area_fraction")
+
+    if output_root:
+        ants.config.dirpath_writeable(output_root)
+        cubes_to_save = {
+            "qrparm.mask": (mask_cube, -1),
+            "qrparm.mask_sea": (ocean_mask_cube, -1),
+            "qrparm.landfrac": (landfrac_cube, None),
+        }
+        for filename, (cube, fill_value) in cubes_to_save.items():
+            filepath = os.path.join(output_root, filename)
+            save_ants(cube, filepath, fill_value)
+
+    return mask_cube, ocean_mask_cube, landfrac_cube
+
+
 def load_data(
     source_path,
     transform_path,
@@ -132,6 +228,11 @@ def load_data(
     source = ants.load_cube(source_path, "land_cover_lccs")
     if target_grid:
         target_cube = ants.load_grid(target_grid)
+    elif isinstance(target_landseamask, iris.cube.Cube):
+        # An already-derived mask cube (e.g. from
+        # generate_masks_from_landfrac) rather than a filepath -- use it
+        # directly, skipping the file-based load_landsea_mask path.
+        target_cube = target_landseamask
     else:
         target_cube = ants.fileformats.load_landsea_mask(
             target_landseamask, land_fraction_threshold
@@ -302,11 +403,23 @@ def main(
     out_filepath,
     target_grid,
     landseamask_in,
+    landfrac_in,
     landseamask_out_root,
     land_fraction_threshold,
     ice_tile_id,
     soil_tile_id,
 ):
+    if landfrac_in:
+        # Masks derived directly from the supplied landfrac rather than
+        # from a pre-existing landseamask file or from the land-cover
+        # source. These become landseamask_in for the rest of this
+        # function (grid extraction, min_frac, make_consistent_with_lsm),
+        # and are saved immediately below (via output_root) if requested,
+        # since they are the user-supplied values of record.
+        landseamask_in, _, _ = generate_masks_from_landfrac(
+            landfrac_in, land_fraction_threshold, landseamask_out_root
+        )
+
     source, grid, src_trans, = load_data(
         source_path,
         transform_path,
@@ -322,7 +435,13 @@ def main(
 
     lct_cube, lsm_cubes = gen_lct(source, grid, src_trans, min_frac, ice_tile_id, soil_tile_id)
 
-    if landseamask_out_root:
+    if landseamask_out_root and not landfrac_in:
+        # Original behaviour: mask/mask_sea/landfrac derived from the
+        # land-cover source via the crosswalk. Skipped when landfrac_in
+        # was supplied, since generate_masks_from_landfrac() above has
+        # already saved the user's own mask/mask_sea/landfrac instead --
+        # re-deriving and overwriting them here would silently discard
+        # the values you explicitly provided.
         ants.config.dirpath_writeable(landseamask_out_root)
         _prepare_mask_cube(lsm_cubes[0])
         land_mask = lsm_cubes[0]
@@ -366,11 +485,29 @@ def _get_parser():
     parser.add_argument("--landseamask-output-root", type=str, help=msg, required=False)
     parser.add_argument("--ice-tile-id", type=int, help="ID of the ice tile", default=9)
     parser.add_argument("--soil-tile-id", type=int, help="ID of the bare soil tile", default=8)
+    parser.add_argument(
+        "--landfrac",
+        type=str,
+        required=False,
+        help=(
+            "Path to a land fraction netCDF. If given, the land mask and "
+            "sea mask are derived directly from it (via --land-threshold) "
+            "and used as the landseamask for the rest of this workflow. "
+            "Mutually exclusive with --target-lsm; compatible with "
+            "--landseamask-output-root (unlike --target-lsm)."
+        ),
+    )
     return parser
 
 
 if __name__ == "__main__":
     args = _get_parser().parse_args()
+    if args.landfrac and args.target_lsm:
+        raise ValueError(
+            "--landfrac and --target-lsm are mutually exclusive -- these "
+            "are two different ways of supplying the same landsea mask "
+            "information, provide only one."
+        )
     if args.landseamask_output_root and args.target_lsm:
         raise ValueError(
             "Output landseamask filepath (landseamask_filepath) "
@@ -384,6 +521,7 @@ if __name__ == "__main__":
         args.output,
         args.target_grid,
         args.target_lsm,
+        args.landfrac,
         args.landseamask_output_root,
         args.land_threshold,
         args.ice_tile_id,
