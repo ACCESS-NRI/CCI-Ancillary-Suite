@@ -409,9 +409,6 @@ def main(
     ice_tile_id,
     soil_tile_id,
 ):
-    if land_fraction_threshold is None:
-        land_fraction_threshold = 1e-6
-
     if landfrac_in:
         # Masks derived directly from the supplied landfrac rather than
         # from a pre-existing landseamask file or from the land-cover

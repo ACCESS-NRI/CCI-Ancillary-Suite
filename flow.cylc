@@ -64,6 +64,9 @@
             VERTICAL_DISCRETIZATION={{ VERTICAL_DISCRETIZATION }}
             {% if GRID_SOURCE == "land_sea_mask" %}
                 TARGET_LSM={{ GRID_FILE }}
+            {% elif GRID_SOURCE == "landfrac" %}
+		TARGET_LSM=${ANCIL_TARGET_PATH}/land_sea_mask/qrparm.mask
+                TARGET_LANDFRAC={{ TARGET_LANDFRAC }}
             {% else %}
 			    TARGET_LSM=${ANCIL_TARGET_PATH}/land_sea_mask/qrparm.mask
             {% endif %}
@@ -109,12 +112,14 @@
 			script = rose task-run --command-key=lsm_source
 		{% elif GRID_SOURCE == "ocean_mesh" %}
 			script = rose task-run --command-key=lsm_source
+		{% elif GRID_SOURCE == "landfrac" %}
+			script = rose task-run --command-key=landfrac_source
 		{% endif %}
 		inherit = PBS_medium_parallel
-		init-script = """
-			module use /g/data/access/ngm/modules
-			module load ants/1.1.0
-		"""
+                init-script = """
+                        module use /g/data/access/ngm/modules
+                        module load ants/1.1.0
+                """
 		[[[environment]]]
 			{% if LAND_MODEL == "CABLE" %}
 				DEFAULT_TRANSFORM = "cci2cable.json"
