@@ -62,6 +62,7 @@
 			CALENDAR={{ CALENDAR }}
 			RESOLUTION={{ RESOLUTION }}
             VERTICAL_DISCRETIZATION={{ VERTICAL_DISCRETIZATION }}
+            GRID_FILE={{ GRID_FILE }}
             {% if GRID_SOURCE == "land_sea_mask" %}
                 TARGET_LSM={{ GRID_FILE }}
             {% else %}
@@ -100,7 +101,7 @@
 
         [[preprocess_CCI_water]]
                 script = rose task-run
-                inherit = PBS_huge_serial
+                inherit = PBS_huge_parallel
  
 	[[ancil_lct]]
 		{% if GRID_SOURCE == "land_cover" %}
@@ -216,7 +217,7 @@
 		script = rose task-run
 
 	[[ancil_orography_filtered_preproc]]
-		inherit = PBS_huge_parallel
+		inherit = PBS_large_parallel
 		script = rose task-run
 
 	[[ancil_orography_unfiltered_preproc]]

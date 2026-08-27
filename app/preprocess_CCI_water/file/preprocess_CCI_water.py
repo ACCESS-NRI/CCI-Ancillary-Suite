@@ -55,7 +55,7 @@ def _parse_args():
                 )
             )
     parser.add_argument(
-            '--fill-depth',
+            '--search-radius',
             type=int,
             default=64,
             help=(
@@ -89,7 +89,7 @@ def main(
         water_bodies_dir,
         output,
         nchunks,
-        fill_depth,
+        search_radius,
         n_workers,
         threads_per_worker,
         ):
@@ -111,7 +111,7 @@ def main(
     upscaled_water_bodies = upscale_water_bodies(ocean_water, all_water)
 
     land_cover = overlay_water_on_land_cover(
-            upscaled_water_bodies, land_cover, fill_depth
+            upscaled_water_bodies, land_cover, search_radius
             )
 
     land_cover = drop_unnecessary_data(land_cover)
@@ -222,7 +222,7 @@ def upscale_water_bodies(ocean_water, all_water):
     return flag_data
 
 
-def overlay_water_on_land_cover(water, land_cover, fill_depth):
+def overlay_water_on_land_cover(water, land_cover, search_radius):
     """
     Apply the permanent water map over the top of the land cover map. The
     permanent water map is taken as the absolute truth in regards to water, and
@@ -231,7 +231,7 @@ def overlay_water_on_land_cover(water, land_cover, fill_depth):
     map, will be filled by the nearest valid land point i.e. nearest point
     along the same latitude considered land by the permanent water map.
 
-    The nearest-valid-point fill is done per-chunk with a `fill_depth`-cell
+    The nearest-valid-point fill is done per-chunk with a `search_radius`-cell
     halo via `map_overlap`, since a true global distance transform can't be
     parallelized without materializing the whole array. See `--fill-depth`
     for the trade-off this introduces.
@@ -273,7 +273,7 @@ def overlay_water_on_land_cover(water, land_cover, fill_depth):
     fill_block = functools.partial(_fill_nearest_block, water_flag=water_flag)
     lccs = lccs.map_overlap(
             fill_block,
-            depth=fill_depth,
+            depth=search_radius,
             boundary='reflect',
             dtype=lccs.dtype,
             )
@@ -351,7 +351,7 @@ if __name__ == "__main__":
             args.CCI_water_dir,
             args.output,
             args.nchunks,
-            args.fill_depth,
+            args.search_radius,
             args.n_workers,
             args.threads_per_worker,
             )
