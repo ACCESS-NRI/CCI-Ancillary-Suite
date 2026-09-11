@@ -22,12 +22,33 @@ def parse_args():
                         help='Path to write the mask and land fractions to.'
                         )
 
-    parser.add_argument('--atm-resolution',
+    parser.add_argument('--grid-file',
                         required=True,
-                        help='String describing the atmosphere resolution e.g. n96e, n512.'
+                        help='Grid namelist describing horizontal resolution'
                         )
 
     return parser.parse_args()
+
+
+def parse_domain(grid_file):
+    """
+    Read the given grid namelist file and use it to determine the desired
+    domain.
+    """
+
+    grid = ants.io.load.load_grid(grid_file)
+
+    lons = grid.coord('longitude')
+    nlon = len(lons.points)
+    dlon = lons.points[1] - lons.points[0]
+    lon_0 = lons.points[0]
+
+    lats = grid.coord('latitude')
+    nlat = len(lats.points)
+    dlat = lats.points[1] - lats.points[0]
+    lat_0 = lats.points[0]
+
+    return nlon, nlat, dlon, dlat, lon_0, lat_0
 
 def parse_resolution_string(atm_res):
     """Parse the string given for the atmosphere resolution and return the
@@ -59,7 +80,7 @@ def load_ocean_data(ocn_mesh_fp):
 
     return ocn_mesh, ocn_mask
 
-def create_um_mesh(nlat, nlon):
+def create_um_mesh(nlat, nlon, dlat, dlon, lat_0, lon_0):
     # make UM mesh file from the required latitudes and longitudes
 
     num_elements = nlon * nlat
@@ -69,34 +90,32 @@ def create_um_mesh(nlat, nlon):
       esmpy.MeshElemType.TRI] * nlon + [esmpy.MeshElemType.QUAD] * ((nlat - 2) * nlon) + [esmpy.MeshElemType.TRI] * nlon
                           )
     element_lon = numpy.zeros(num_elements)
-    element_lon[:] = ((element_ids - 1) % nlon + 0.5) * (360 / nlon)
+    element_lon[:] = lon_0 + ((element_ids - 1) % nlon + 0.5) * dlon
 
     element_lat = numpy.zeros(num_elements)
-    element_lat[:] = ((element_ids - 1) // nlon + 0.5) * (180 / nlat)  - 90
+    element_lat[:] = lat_0 + ((element_ids - 1) // nlon + 0.5) * dlat
 
     element_coords = numpy.zeros((num_elements, 2))
     element_coords[:, 0] = element_lon
     element_coords[:, 1] = element_lat
 
-    dx = 360 / nlon
-    dy = 180 / nlat
     pi_over_180 = numpy.pi / 180
-    element_areas = dx * pi_over_180 * (
-      numpy.sin((element_lat + 0.5 * dy) * pi_over_180) - numpy.sin((element_lat - 0.5 * dy) * pi_over_180)
+    element_areas = dlon * pi_over_180 * (
+      numpy.sin((element_lat + 0.5 * dlat) * pi_over_180) - numpy.sin((element_lat - 0.5 * dlat) * pi_over_180)
     )
 
     num_nodes = nlon * (nlat - 1) + 2
     node_ids = numpy.arange(1, num_nodes + 1)
 
     node_lon = numpy.zeros(num_nodes)
-    node_lon[0] = 0.0
-    node_lon[-1] = 0.0
-    node_lon[1:-1] = element_lon[:-nlon] - 0.5 * (360 / nlon)
+    node_lon[0] = lon_0 - 0.5 * dlon
+    node_lon[-1] = node_lon[0] + (nlon + 1) * dlon
+    node_lon[1:-1] = element_lon[:-nlon] - 0.5 * dlon
 
     node_lat = numpy.zeros(num_nodes)
-    node_lat[0] = -90.0
-    node_lat[-1] = 90.0
-    node_lat[1:-1] = element_lat[:-nlon] + 0.5 * (180 / nlat)
+    node_lat[0] = lat_0 - 0.5 * dlat
+    node_lat[-1] = node_lat[0] + (nlat + 1) * dlat
+    node_lat[1:-1] = element_lat[:-nlon] + dlat
 
     node_coords = numpy.zeros((num_nodes, 2))
     node_coords[:, 0] = node_lon
@@ -206,13 +225,10 @@ def create_landfracs(um_mesh, ocn_mesh, ocn_mask):
     return new_land_frac
 
 
-def save_landfracs(nlat, nlon, land_frac, out_fp):
+def save_landfracs(nlat, nlon, dlat, dlon, lat_0, lon_0, land_frac, out_fp):
     # Write the land fractions to NetCDF and as UM ancillary file
-    dx = 360 / nlon
-    dy = 180 / nlat
-
-    lat = (-90.0 + 0.5 * dy) + numpy.arange(nlat) * dy
-    lon = 0.5 * dx + numpy.arange(nlon) * dx
+    lat = lat_0 + numpy.arange(nlat) * dlat
+    lon = lon_0 + numpy.arange(nlon) * dlon
 
     lon_coord = xarray.DataArray(
       dims=['lon'],
@@ -286,7 +302,7 @@ def save_landfracs(nlat, nlon, land_frac, out_fp):
 if __name__ == '__main__':
     args = parse_args()
     ocean_mesh, ocean_mask = load_ocean_data(args.ocean_mesh_file)
-    nlon, nlat = parse_resolution_string(args.atm_resolution)
-    um_mesh = create_um_mesh(nlat, nlon)
+    nlon, nlat, dlon, dlat, lon_0, lat_0 = parse_resolution_string(args.atm_resolution)
+    um_mesh = create_um_mesh(nlat, nlon, dlat, dlon, lat_0, lon_0)
     land_fractions = create_landfracs(um_mesh, ocean_mesh, ocean_mask)
-    save_landfracs(nlat, nlon, land_fractions, args.output)
+    save_landfracs(nlat, nlon, dlat, dlon, lat_0, lon_0, land_fractions, args.output)
