@@ -254,6 +254,34 @@
 		inherit = PBS_large_parallel
 		script = rose task-run
 
+    [[regrid_seasalt_aerosol]]
+        inherit = PBS_medium_parallel
+        script = rose task-run
+
+    [[regrid_biog_aerosol]]
+        inherit = PBS_medium_parallel
+        script = rose task-run
+
+    [[regrid_biom_aerosol]]
+        inherit = PBS_medium_parallel
+        script = rose task-run
+
+    [[regrid_ocff_aerosol]]
+        inherit = PBS_medium_parallel
+        script = rose task-run
+
+    [[regrid_blck_aerosol]]
+        inherit = PBS_medium_parallel
+        script = rose task-run
+
+    [[regrid_dust_aerosol]]
+        inherit = PBS_medium_parallel
+        script = rose task-run
+
+    [[regrid_sulp_aerosol]]
+        inherit = PBS_medium_parallel
+        script = rose task-run
+
 	[[regrid_ozone]]
 		inherit = PBS_medium_parallel
 		script = rose task-run
