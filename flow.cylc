@@ -106,9 +106,9 @@
                 [[[environment]]]
                         OCEAN_MESH = {{ GRID_FILE }}
 
-        [[preprocess_CCI_water]]
-                script = rose task-run
-                inherit = PBS_huge_parallel
+    [[preprocess_CCI_water]]
+        script = rose task-run
+        inherit = PBS_very_parallel
  
 	[[ancil_lct]]
 		{% if GRID_SOURCE == "land_cover" %}
@@ -141,9 +141,9 @@
 		inherit = PBS_medium_parallel
 		script = rose task-run
 
-        [[ancil_fix_antarctic_permanent_ice]]
-                inherit = PBS_medium_serial
-                script = rose task-run
+    [[ancil_fix_antarctic_permanent_ice]]
+        inherit = PBS_medium_serial
+        script = rose task-run
 
 	[[regrid_ncar_lulcc]]
 		inherit = PBS_medium_serial
