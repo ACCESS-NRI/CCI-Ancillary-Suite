@@ -266,7 +266,7 @@
         inherit = PBS_medium_parallel
         script = rose task-run
 
-    [[regrid_ocff_aerosol]]
+    [[regrid_ofcc_aerosol]]
         inherit = PBS_medium_parallel
         script = rose task-run
 
