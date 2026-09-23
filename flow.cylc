@@ -41,7 +41,7 @@
                     ancil_orographic_wavedrag => regrid_seasalt_aerosol
                     ancil_orographic_wavedrag => regrid_biog_aerosol
                     ancil_orographic_wavedrag => regrid_biom_aerosol
-                    ancil_orographic_wavedrag => regrid_ofcc_aerosol
+                    ancil_orographic_wavedrag => regrid_ocff_aerosol
                     ancil_orographic_wavedrag => regrid_sulp_aerosol
                     ancil_orographic_wavedrag => regrid_blck_aerosol
                     ancil_orographic_wavedrag => regrid_dust_aerosol
@@ -271,7 +271,7 @@
         inherit = PBS_medium_parallel
         script = rose task-run
 
-    [[regrid_ofcc_aerosol]]
+    [[regrid_ocff_aerosol]]
         inherit = PBS_medium_parallel
         script = rose task-run
 
