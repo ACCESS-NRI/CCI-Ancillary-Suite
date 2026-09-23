@@ -10,7 +10,7 @@
 		R1 = """
 			{% if GRID_SOURCE == "ocean_mesh" %}
 				(landseamask_from_ocean_mesh & preprocess_CCI_water) => ancil_lct
-            {% elif GRID_SOURCE == "land_Fractions" %}
+            {% elif GRID_SOURCE == "land_fractions" %}
                 (landseamask_from_land_fractions & preprocess_CCI_water) => ancil_lct
 			{% endif %}
 			ancil_lct => regrid_ncar_lulcc
@@ -112,7 +112,7 @@
                 [[[environment]]]
                         OCEAN_MESH = {{ GRID_FILE }}
 
-	[[landseamask_from_ocean_mesh]]
+	[[landseamask_from_land_fractions]]
 		script = rose task-run
 		inherit = PBS_small_serial
                 [[[environment]]]
