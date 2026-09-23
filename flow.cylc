@@ -35,7 +35,19 @@
             {% if ATMOSPHERE_ANCILLARIES %}
                 (ancil_orographic_formdrag_preproc & ancil_lct) => ancil_orographic_formdrag
                 (ancil_lct & ancil_orography_unfiltered_preproc) => ancil_orography_mean => ancil_orographic_wavedrag
-                (ancil_aeroclim_preproc & ancil_orographic_wavedrag) => regrid_aerosol
+                {% if AEROSOLS == "NetCDF" %}
+                    (ancil_aeroclim_preproc & ancil_orographic_wavedrag) => regrid_aerosol
+                {% elif AEROSOLS == "PP" %}
+                    ancil_orographic_wavedrag => regrid_seasalt_aerosol
+                    ancil_orographic_wavedrag => regrid_biog_aerosol
+                    ancil_orographic_wavedrag => regrid_biom_aerosol
+                    ancil_orographic_wavedrag => regrid_ocff_aerosol
+                    ancil_orographic_wavedrag => regrid_sulp_aerosol
+                    ancil_orographic_wavedrag => regrid_blck_aerosol
+                    ancil_orographic_wavedrag => regrid_dust_aerosol
+                {% else %}
+                    {{ raise ("Invalid AEROSOLS option: " ~ AEROSOLS) }}
+                {% endif %}
                 (ancil_orography_filtered_preproc & ancil_orography_mean) => ancil_orographic_wavedrag => regrid_ozone
                 ancil_lct => ancil_clim_dms
                 ancil_lct => ancil_clim_sea
@@ -99,9 +111,9 @@
                 [[[environment]]]
                         OCEAN_MESH = {{ GRID_FILE }}
 
-        [[preprocess_CCI_water]]
-                script = rose task-run
-                inherit = PBS_huge_parallel
+    [[preprocess_CCI_water]]
+        script = rose task-run
+        inherit = PBS_very_parallel
  
 	[[ancil_lct]]
 		{% if GRID_SOURCE == "land_cover" %}
@@ -134,9 +146,9 @@
 		inherit = PBS_medium_parallel
 		script = rose task-run
 
-        [[ancil_fix_antarctic_permanent_ice]]
-                inherit = PBS_medium_serial
-                script = rose task-run
+    [[ancil_fix_antarctic_permanent_ice]]
+        inherit = PBS_medium_serial
+        script = rose task-run
 
 	[[regrid_ncar_lulcc]]
 		inherit = PBS_medium_serial
@@ -246,6 +258,34 @@
 	[[regrid_aerosol]]
 		inherit = PBS_large_parallel
 		script = rose task-run
+
+    [[regrid_seasalt_aerosol]]
+        inherit = PBS_medium_parallel
+        script = rose task-run
+
+    [[regrid_biog_aerosol]]
+        inherit = PBS_medium_parallel
+        script = rose task-run
+
+    [[regrid_biom_aerosol]]
+        inherit = PBS_medium_parallel
+        script = rose task-run
+
+    [[regrid_ocff_aerosol]]
+        inherit = PBS_medium_parallel
+        script = rose task-run
+
+    [[regrid_blck_aerosol]]
+        inherit = PBS_medium_parallel
+        script = rose task-run
+
+    [[regrid_dust_aerosol]]
+        inherit = PBS_medium_parallel
+        script = rose task-run
+
+    [[regrid_sulp_aerosol]]
+        inherit = PBS_medium_parallel
+        script = rose task-run
 
 	[[regrid_ozone]]
 		inherit = PBS_medium_parallel
