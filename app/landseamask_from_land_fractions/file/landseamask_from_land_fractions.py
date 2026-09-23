@@ -11,7 +11,7 @@ def _parse_args():
             )
 
     parser.add_argument(
-            '--output',
+            '--output-path',
             required=True,
             help='Where to write generated land and sea masks.'
             )
@@ -55,6 +55,5 @@ if __name__ == '__main__':
     
     landfrac_to_masks(
             args.land_fractions,
-            args.output_landmask,
-            args.output_seamask
+            args.output_path,
             )

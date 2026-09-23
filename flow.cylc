@@ -112,6 +112,12 @@
                 [[[environment]]]
                         OCEAN_MESH = {{ GRID_FILE }}
 
+	[[landseamask_from_ocean_mesh]]
+		script = rose task-run
+		inherit = PBS_small_serial
+                [[[environment]]]
+                        LAND_FRACTIONS = {{ GRID_FILE }}
+
     [[preprocess_CCI_water]]
         script = rose task-run
         inherit = PBS_very_parallel
