@@ -50,7 +50,6 @@ def landfrac_to_landmask(landfrac_path, out_path):
     iris.fileformats.pp.save(seamask, out_path + 'qrparm.mask_sea')
 
 
-
 if __name__ == '__main__':
     args = _parse_args()
     
