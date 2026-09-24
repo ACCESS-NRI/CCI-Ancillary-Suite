@@ -1,5 +1,6 @@
 import argparse
-import iris
+import ants
+import numpy
 
 
 def _parse_args():
@@ -20,11 +21,9 @@ def _parse_args():
 
 
 def landfrac_to_landmask(landfrac_path, out_path):
-    land_fracs = iris.load_cube(landfrac_path)
+    land_fracs = ants.io.load.load_cube(landfrac_path)
 
-    landmask = land_fracs > 0.0
-    seamask = land_fracs < 1.0
-
+    landmask = land_fracs.copy(data=(land_fracs.data > 0.0).astype(numpy.int64))
     landmask.attributes["valid_min"] = 0
     landmask.attributes["valid_max"] = 1
     landmask.attributes["grid_staggering"] = 6
@@ -34,9 +33,10 @@ def landfrac_to_landmask(landfrac_path, out_path):
     for dim in landmask.coords():
         dim.bounds = None
 
-    iris.fileformats.netcdf.save(landmask, out_path + 'qrparm.mask.nc')
-    iris.fileformats.pp.save(landmask, out_path + 'qrparm.mask')
+    ants.io.save.netcdf(landmask, out_path + '/qrparm.mask')
+    ants.io.save.ancil(landmask, out_path + '/qrparm.mask')
 
+    seamask = land_fracs.copy(data=(land_fracs.data < 1.0).astype(numpy.int64))
     seamask.attributes["valid_min"] = 0
     seamask.attributes["valid_max"] = 1
     seamask.attributes["grid_staggering"] = 6
@@ -46,14 +46,14 @@ def landfrac_to_landmask(landfrac_path, out_path):
     for dim in seamask.coords():
         dim.bounds = None
 
-    iris.fileformats.netcdf.save(seamask, out_path + 'qrparm.mask_sea.nc')
-    iris.fileformats.pp.save(seamask, out_path + 'qrparm.mask_sea')
+    ants.io.save.netcdf(seamask, out_path + '/qrparm.mask_sea')
+    ants.io.save.ancil(seamask, out_path + '/qrparm.mask_sea')
 
 
 if __name__ == '__main__':
     args = _parse_args()
     
-    landfrac_to_masks(
+    landfrac_to_landmask(
             args.land_fractions,
             args.output_path,
             )
