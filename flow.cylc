@@ -9,9 +9,10 @@
 	[[graph]]
 		R1 = """
 			{% if GRID_SOURCE == "ocean_mesh" %}
-				landseamask_from_ocean_mesh => ancil_lct
+				(landseamask_from_ocean_mesh & preprocess_CCI_water) => ancil_lct
+            {% elif GRID_SOURCE == "land_fractions" %}
+                (landseamask_from_land_fractions & preprocess_CCI_water) => ancil_lct
 			{% endif %}
-			preprocess_CCI_water => ancil_lct
 			ancil_lct => regrid_ncar_lulcc
 			ancil_lct => ancil_fix_antarctic_permanent_ice
 			(ancil_fix_antarctic_permanent_ice & regrid_ncar_lulcc) => ancil_split_grass_types
@@ -111,12 +112,20 @@
                 [[[environment]]]
                         OCEAN_MESH = {{ GRID_FILE }}
 
+	[[landseamask_from_land_fractions]]
+		script = rose task-run
+		inherit = PBS_small_serial
+                [[[environment]]]
+                        LAND_FRACTIONS = {{ GRID_FILE }}
+
     [[preprocess_CCI_water]]
         script = rose task-run
         inherit = PBS_very_parallel
  
 	[[ancil_lct]]
 		{% if GRID_SOURCE == "land_cover" %}
+			script = rose task-run --command-key=grid_source
+		{% elif GRID_SOURCE == "land_fractions" %}
 			script = rose task-run --command-key=grid_source
 		{% elif GRID_SOURCE == "land_sea_mask" %}
 			script = rose task-run --command-key=lsm_source
