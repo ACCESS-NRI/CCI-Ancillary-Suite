@@ -170,7 +170,7 @@ def generate_ozone(
                 )
 
     # Convert from molar fraction to mass fraction
-    ozone_on_grid = ozone_on_grid * (mass_ozone / mass_air)
+    ozone_on_grid = ozone_on_grid * ppmv2mmr
 
     # Perform zonal averaging if requested
     if zonal:
