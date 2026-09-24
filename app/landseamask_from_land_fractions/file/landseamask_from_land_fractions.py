@@ -23,6 +23,12 @@ def _parse_args():
 def landfrac_to_landmask(landfrac_path, out_path):
     land_fracs = ants.io.load.load_cube(landfrac_path)
 
+    # We'll also want to copy the land fractions to the working dir
+    ants.io.save.netcdf(land_fracs, out_path + '/qrparm.landfrac')
+    ants.io.save.ancil(land_fracs, out_path + '/qrparm.landfrac')
+
+    # Don't worry about thresholding- assume user has already done desired
+    # preprocessing of removing almost-0 landfracs
     landmask = land_fracs.copy(data=(land_fracs.data > 0.0).astype(numpy.int64))
     landmask.attributes["valid_min"] = 0
     landmask.attributes["valid_max"] = 1
@@ -36,6 +42,8 @@ def landfrac_to_landmask(landfrac_path, out_path):
     ants.io.save.netcdf(landmask, out_path + '/qrparm.mask')
     ants.io.save.ancil(landmask, out_path + '/qrparm.mask')
 
+    # The land mask and sea mask are not inversions of each other- they overlap
+    # in grid cells when 0.0 < fraction < 1.0
     seamask = land_fracs.copy(data=(land_fracs.data < 1.0).astype(numpy.int64))
     seamask.attributes["valid_min"] = 0
     seamask.attributes["valid_max"] = 1
